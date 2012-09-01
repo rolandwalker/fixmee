@@ -511,6 +511,7 @@ Expressed as an element of `fixmee-notice-list'.")
 
 (when (stringp fixmee-mode-lighter)
       (callf propertize fixmee-mode-lighter 'local-map fixmee-lighter-map
+                                            'keymap fixmee-lighter-map
                                             'help-echo "fixmee-mode: mouse-3 menu\nwheel down/up by urgency\nwheel M-down/M-up by position."))
 
 ;;; aliases and fsets
