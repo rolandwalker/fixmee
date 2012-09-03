@@ -395,21 +395,21 @@ The format for key sequences is as defined by `kbd'."
   "Command bound to mouse-1 when clicking on \"fixme\" notices.
 
 The format for key sequences is as defined by `kbd'."
-   :type 'symbol
+   :type 'function
    :group 'fixmee-keys)
 
 (defcustom fixmee-within-notice-mouse-2-command 'ignore
   "Command bound to mouse-2 when clicking on \"fixme\" notices.
 
 The format for key sequences is as defined by `kbd'."
-   :type 'symbol
+   :type 'function
    :group 'fixmee-keys)
 
 (defcustom fixmee-within-notice-down-mouse-3-command 'fixmee-notice-popup
   "Command bound to down-mouse-3 when clicking on \"fixme\" notices.
 
 The format for key sequences is as defined by `kbd'."
-   :type 'symbol
+   :type 'function
    :group 'fixmee-keys)
 
 (defcustom fixmee-within-notice-goto-next-by-position-keystrokes '("M-n")
