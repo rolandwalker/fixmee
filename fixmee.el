@@ -204,7 +204,7 @@
   :link '(emacs-commentary-link "fixmee")
   :prefix "fixmee-"
   :group 'navigation
-  :group 'extensions)
+  :group 'convenience)
 
 (defcustom fixmee-notice-regexp "\\(@@@+\\|\\_<\\(?:[Tt][Oo][Dd][Oo]+\\|[Ff][Ii][Xx][Mm][Ee]+\\|XXX+\\)\\_>\\)"
   "Pattern for matching \"fixme\" notices.
