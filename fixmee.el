@@ -15,6 +15,16 @@
 ;;
 ;;; Commentary:
 ;;
+;; Quickstart
+;;
+;;     (require 'fixmee)
+;;
+;;     (global-fixmee-mode 1)
+;;
+;;     right-click on the word "fixme" in a comment
+;;
+;; Explanation
+;;
 ;; Fixmee-mode tracks "fixme" notices in code comments, highlights
 ;; them, ranks them by urgency, and lets you navigate to them quickly.
 ;;
@@ -22,9 +32,7 @@
 ;; character.  For example, one might write "FIXMEEEEEEEEE" for an
 ;; important issue.
 ;;
-;; Quickstart:
-;;
-;; Add the following to your ~/.emacs
+;; To use fixmee-mode, add the following to your ~/.emacs
 ;;
 ;;     (require 'fixmee)
 ;;     (global-fixmee-mode 1)
@@ -40,14 +48,19 @@
 ;;
 ;;     M-x fixmee RET
 ;;
-;; Key Bindings:
+;; or
+;;
+;;    roll the mouse wheel when hovering over the text "fixm"
+;;    in the modeline.
+;;
+;; Key Bindings
 ;;
 ;; The default key bindings are
 ;;
-;;     C-c f `fixmee-goto-nextmost-urgent'
-;;     C-c F `fixmee-goto-prevmost-urgent'
-;;     M-n   `fixmee-goto-next-by-position'      ; only when the point is
-;;     M-p   `fixmee-goto-previous-by-position'  ; inside a fixme notice
+;;     C-c f  `fixmee-goto-nextmost-urgent'
+;;     C-c F  `fixmee-goto-prevmost-urgent'
+;;     M-n    `fixmee-goto-next-by-position'      ; only when the point is
+;;     M-p    `fixmee-goto-previous-by-position'  ; inside a fixme notice
 ;;
 ;; When the smartrep package is installed, the "C-c" prefix need not
 ;; be used for consecutive fixmee-mode keyboard commands.  Instead,
@@ -56,11 +69,11 @@
 ;; There is also a context menu and mouse-wheel bindings on the
 ;; minor-mode lighter in the modeline:
 ;;
-;;             mouse-1   context menu
-;;       wheel-down/up   next/prev by urgency
-;;     M-wheel-down/up   next/prev by position
+;;             mouse-1  context menu
+;;       wheel-down/up  next/prev by urgency
+;;     M-wheel-down/up  next/prev by position
 ;;
-;; Patterns:
+;; Patterns
 ;;
 ;; The following fixme patterns are supported by default:
 ;;
@@ -89,47 +102,47 @@
 ;;
 ;; Bugs
 ;;
-;;    When comment-start is defined, only the first notice on a line
-;;    is lit up by button-lock, though fixme-mode is aware of multiple
-;;    notices on a line.  This is worked around for the moment by
-;;    stripping these cases from fixmee-notice-list.  Better would be
-;;    to add comment-sensitivity logic to button-lock, and remove the
-;;    comment-matching section of the regexp passed to button-lock.
+;;     When comment-start is defined, only the first notice on a line
+;;     is lit up by button-lock, though fixmee-mode is aware of multiple
+;;     notices on a line.  This is worked around for the moment by
+;;     stripping these cases from fixmee-notice-list.  Better would be
+;;     to add comment-sensitivity logic to button-lock, and remove the
+;;     comment-matching section of the regexp passed to button-lock.
 ;;
-;;    Fixmee-maybe-turn-on gets called multiple times when a file
-;;    is loaded.
+;;     Fixmee-maybe-turn-on gets called multiple times when a file
+;;     is loaded.
 ;;
-;;    Fixmee-buffer-include-functions may not contain the function
-;;    'frame-bufs-associated-p, because a new buffer is not yet
-;;    associated with the frame at the time the global mode check
-;;    calls fixmee-maybe-turn-on.
+;;     Fixmee-buffer-include-functions may not contain the function
+;;     'frame-bufs-associated-p, because a new buffer is not yet
+;;     associated with the frame at the time the global mode check
+;;     calls fixmee-maybe-turn-on.
 ;;
 ;; TODO
 ;;
-;;    Better feedback messages for end-of-list and start-of-list.
+;;     Consider changing prefix arg to mean "constrain this command to
+;;     the current file".
 ;;
-;;    Integrate with next-error (make a separate buffer showing hits) -
-;;    for first pass at this just send regexp to occur, second pass
-;;    build a buffer from the contents of fixmee-notice-list.
+;;     Better feedback messages for end-of-list and start-of-list.
 ;;
-;;    Consider changing prefix arg to mean "constrain this command to
-;;    the current file".
+;;     Integrate with next-error (make a separate buffer showing hits) -
+;;     for first pass at this just send regexp to occur, second pass
+;;     build a buffer from the contents of fixmee-notice-list.
 ;;
-;;    Bookmark integration? (implicit bookmarking on notices).
+;;     Bookmark integration? (implicit bookmarking on notices).
 ;;
-;;    Wrap/cycle options on navigation-by-position.
+;;     Wrap/cycle options on navigation-by-position.
 ;;
-;;    How to get last-command when user does M-x? (smex is not helping
-;;    here).  (nth 0 command-history) ?
+;;     How to get last-command when user does M-x? (smex is not helping
+;;     here).  (nth 0 command-history) ?
 ;;
-;;    Navigation can land on line near vertical edge of window -
-;;    should respect user settings and scroll in as needed for
-;;    context.
+;;     Navigation can land on line near vertical edge of window -
+;;     should respect user settings and scroll in as needed for
+;;     context.
 ;;
-;;    Project support.
+;;     Project support.
 ;;
-;;    Some kind of extra comment indicating a notice is to be ignored?
-;;    Lead with a backwhack?
+;;     Some kind of extra comment indicating a notice is to be ignored?
+;;     Lead with a backwhack?
 ;;
 ;;; License
 ;;
