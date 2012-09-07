@@ -9,7 +9,7 @@
 ;; Last-Updated: 30 Aug 2012
 ;; EmacsWiki: FixmeeMode
 ;; Keywords: navigation, convenience
-;; Package-Requires: ((button-lock 0.9.8) (nav-flash "1.0.0") (back-button "0.6.0") (smartrep "0.0.3"))
+;; Package-Requires: ((button-lock "0.9.8") (nav-flash "1.0.0") (back-button "0.6.0") (smartrep "0.0.3"))
 ;;
 ;; Simplified BSD License
 ;;
