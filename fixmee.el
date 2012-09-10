@@ -484,21 +484,23 @@ Expressed as an element of `fixmee-notice-list'.")
 
 (defvar fixmee-mode-map (make-sparse-keymap) "Keymap for `fixmee-mode' minor-mode.")
 
-(let ((fixmee-navigation-commands (remq 'fixmee fixmee-navigation-commands)))
-  (if (and (stringp fixmee-smartrep-prefix)
-           (length fixmee-smartrep-prefix)
-           (featurep 'smartrep))
-      (let ((keys nil))
-        (dolist (cmd fixmee-navigation-commands)
-          (dolist (k (remove-if-not #'(lambda (x)
-                                        (string-match-p (concat "\\`" fixmee-smartrep-prefix "\\>") x))
-                                    (symbol-value (intern (concat (symbol-name cmd) "-keystrokes")))))
-            (push (cons (replace-regexp-in-string (concat "\\`" fixmee-smartrep-prefix "\\>[ \t]*") "" k) cmd) keys)))
-        (smartrep-define-key fixmee-mode-map fixmee-smartrep-prefix keys))
-    ;; else
-    (dolist (cmd fixmee-navigation-commands)
-      (dolist (k (symbol-value (intern (concat (symbol-name cmd) "-keystrokes"))))
-        (define-key fixmee-mode-map (read-kbd-macro k) cmd)))))
+(let ((smart-keys nil))
+  (dolist (cmd (remq 'fixmee fixmee-navigation-commands))
+    (dolist (k (symbol-value (intern (concat (symbol-name cmd) "-keystrokes"))))
+      (if (and (featurep 'smartrep)
+               (stringp fixmee-smartrep-prefix)
+               (> (length fixmee-smartrep-prefix) 0)
+               (string-match-p (concat "\\`" fixmee-smartrep-prefix "\\>") k))
+          (push (cons (replace-regexp-in-string
+                       (concat "\\`" fixmee-smartrep-prefix "\\>[ \t]*")
+                       ""
+                       k)
+                      cmd)
+                smart-keys)
+        ;; else
+        (define-key fixmee-mode-map (read-kbd-macro k) cmd))))
+  (when smart-keys
+    (smartrep-define-key fixmee-mode-map fixmee-smartrep-prefix smart-keys)))
 
 ;;; lighter
 
