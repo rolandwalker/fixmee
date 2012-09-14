@@ -188,9 +188,7 @@
 ;;; requires
 
 ;; for caddr, cadddr, incf, decf, callf, callf2, remove-if-not, position
-(eval-when-compile
-  (defvar button-lock-mode)
-  (require 'cl))
+(require 'cl)
 
 (require 'nav-flash   nil t)
 (require 'back-button nil t)
@@ -202,11 +200,13 @@
 (declare-function smartrep-define-key                     "smartrep.el")
 (declare-function back-button-push-mark                   "back-button.el")
 (declare-function back-button-push-mark-local-and-global  "back-button.el")
-(declare-function remove-if-not                           "cl-seq.el")
-(declare-function position                                "cl-seq.el")
 (declare-function button-lock-called-interactively-p      "button-lock.el")
 (declare-function button-lock-unset-button                "button-lock.el")
 (declare-function button-lock-extend-binding              "button-lock.el")
+
+(eval-when-compile
+  ;; declarations for byte compiler
+  (defvar button-lock-mode))
 
 ;;; customizable variables
 
