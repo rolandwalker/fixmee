@@ -531,6 +531,7 @@ Expressed as an element of `fixmee-notice-list'.")
 
 ;;; aliases and fsets
 
+;;;###autoload
 (defalias 'fixmee 'fixmee-goto-nextmost-urgent)
 
 ;;; compatibility functions
