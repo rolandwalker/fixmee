@@ -60,22 +60,23 @@ keep pressing `f` (or whichever key you set in customize).
 There is also a context menu and mouse-wheel bindings on the
 minor-mode lighter in the modeline:
 
-            mouse-1  context menu
-      wheel-down/up  next/prev by urgency
-    M-wheel-down/up  next/prev by position
+	        mouse-1  context menu
+	  wheel-down/up  next/prev by urgency
+	M-wheel-down/up  next/prev by position
 
 Patterns
 --------
 
 The following fixme patterns are supported by default:
 
-    @@@
-    XXX         ; only this one is case-sensitive
-    todo
-    fixme
+	@@@
+	XXX         ; only this one is case-sensitive
+	todo
+	fixme
 
 Compatibility and Requirements
 ------------------------------
+
 Tested on GNU Emacs versions 23.3 and 24.1
 
 Requires [button-lock.el](http://github.com/rolandwalker/button-lock)
