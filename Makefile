@@ -24,11 +24,14 @@ PACKAGE_NAME=$(shell basename $(WORK_DIR))
 AUTOLOADS_FILE=$(PACKAGE_NAME)-loaddefs.el
 TEST_DIR=ert-tests
 TEST_DEP_1=ert
-TEST_DEP_1_URL=http://bzr.savannah.gnu.org/lh/emacs/emacs-24/download/head:/ert.el-20110112160650-056hnl9qhpjvjicy-2/ert.el
+TEST_DEP_1_STABLE_URL=http://bzr.savannah.gnu.org/lh/emacs/emacs-24/download/head:/ert.el-20110112160650-056hnl9qhpjvjicy-2/ert.el
+TEST_DEP_1_LATEST_URL=https://raw.github.com/emacsmirror/emacs/master/lisp/emacs-lisp/ert.el
 TEST_DEP_2=button-lock
-TEST_DEP_2_URL=https://raw.github.com/rolandwalker/button-lock/1feabe411a1eefa061323f54004e8cb02b0e6273/button-lock.el
+TEST_DEP_2_STABLE_URL=https://raw.github.com/rolandwalker/button-lock/1feabe411a1eefa061323f54004e8cb02b0e6273/button-lock.el
+TEST_DEP_2_LATEST_URL=https://raw.github.com/rolandwalker/button-lock/master/button-lock.el
 TEST_DEP_3=tabulated-list
-TEST_DEP_3_URL=https://raw.github.com/sigma/tabulated-list.el/b547d9b728935102d1c418bc0e978c221c37f6ab/tabulated-list.el
+TEST_DEP_3_STABLE_URL=https://raw.github.com/sigma/tabulated-list.el/b547d9b728935102d1c418bc0e978c221c37f6ab/tabulated-list.el
+TEST_DEP_3_LATEST_URL=https://raw.github.com/sigma/tabulated-list.el/master/tabulated-list.el
 
 build :
 	$(EMACS) $(EMACS_BATCH) --eval             \
@@ -62,9 +65,14 @@ test-dep-3 :
 	(echo "Can't load test dependency $(TEST_DEP_3).el, run 'make downloads' to fetch it" ; exit 1)
 
 downloads :
-	$(CURL) '$(TEST_DEP_1_URL)' > $(TEST_DIR)/$(TEST_DEP_1).el
-	$(CURL) '$(TEST_DEP_2_URL)' > $(TEST_DIR)/$(TEST_DEP_2).el
-	$(CURL) '$(TEST_DEP_3_URL)' > $(TEST_DIR)/$(TEST_DEP_3).el
+	$(CURL) '$(TEST_DEP_1_STABLE_URL)' > $(TEST_DIR)/$(TEST_DEP_1).el
+	$(CURL) '$(TEST_DEP_2_STABLE_URL)' > $(TEST_DIR)/$(TEST_DEP_2).el
+	$(CURL) '$(TEST_DEP_3_STABLE_URL)' > $(TEST_DIR)/$(TEST_DEP_3).el
+
+downloads-latest :
+	$(CURL) '$(TEST_DEP_1_LATEST_URL)' > $(TEST_DIR)/$(TEST_DEP_1).el
+	$(CURL) '$(TEST_DEP_2_LATEST_URL)' > $(TEST_DIR)/$(TEST_DEP_2).el
+	$(CURL) '$(TEST_DEP_3_LATEST_URL)' > $(TEST_DIR)/$(TEST_DEP_3).el
 
 autoloads :
 	$(EMACS) $(EMACS_BATCH) --eval                       \
