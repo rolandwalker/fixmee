@@ -8,11 +8,13 @@ Quickly navigate to FIXME notices in Emacs.
 Quickstart
 ----------
 
-	(require 'fixmee)
-
-	(global-fixmee-mode 1)
-
-	right-click on the word "fixme" in a comment
+```lisp
+(require 'fixmee)
+ 
+(global-fixmee-mode 1)
+ 
+;; right-click on the word "fixme" in a comment
+```
 
 fixmee-mode
 -----------
@@ -25,8 +27,10 @@ For example, one might write `FIXMEEEEEEEEE` for an important issue.
 
 To use fixmee-mode, add the following to your ~/.emacs
 
-	(require 'fixmee)
-	(global-fixmee-mode 1)
+```lisp
+(require 'fixmee)
+(global-fixmee-mode 1)
+```
 
 Then, open some buffers and right-click on the word "fixme" in a
 comment
