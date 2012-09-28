@@ -34,6 +34,10 @@ TEST_DEP_3=tabulated-list
 TEST_DEP_3_STABLE_URL=https://raw.github.com/sigma/tabulated-list.el/b547d9b728935102d1c418bc0e978c221c37f6ab/tabulated-list.el
 TEST_DEP_3_LATEST_URL=https://raw.github.com/sigma/tabulated-list.el/master/tabulated-list.el
 
+.PHONY : build downloads downloads-latest autoloads test-autoloads test-travis \
+         test test-interactive clean edit test-dep-1 test-dep-2 test-dep-3     \
+         test-dep-4 test-dep-5 test-dep-6 test-dep-7 test-dep-8 test-dep-9
+
 build :
 	$(EMACS) $(EMACS_BATCH) --eval             \
 	    "(progn                                \
