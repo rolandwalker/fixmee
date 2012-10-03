@@ -35,9 +35,9 @@ TEST_DEP_3_STABLE_URL=https://raw.github.com/sigma/tabulated-list.el/b547d9b7289
 TEST_DEP_3_LATEST_URL=https://raw.github.com/sigma/tabulated-list.el/master/tabulated-list.el
 
 .PHONY : build downloads downloads-latest autoloads test-autoloads test-travis \
-         test test-prep test-batch test-interactive clean edit test-dep-1      \
-         test-dep-2 test-dep-3 test-dep-4 test-dep-5 test-dep-6 test-dep-7     \
-         test-dep-8 test-dep-9
+         test test-prep test-batch test-interactive test-tests clean edit      \
+         test-dep-1 test-dep-2 test-dep-3 test-dep-4 test-dep-5 test-dep-6     \
+         test-dep-7 test-dep-8 test-dep-9
 
 build :
 	$(EMACS) $(EMACS_BATCH) --eval             \
@@ -93,7 +93,10 @@ test-autoloads : autoloads
 test-travis :
 	@if test -z "$$TRAVIS" && test -e $(TRAVIS_FILE); then travis-lint $(TRAVIS_FILE); fi
 
-test-prep : build test-dep-1 test-dep-2 test-dep-3 test-autoloads test-travis
+test-tests :
+	@perl -ne 'if (m/^\s*\(\s*ert-deftest\s*(\S+)/) {die "$$1 test name duplicated in $$ARGV\n" if $$dupes{$$1}++}' $(TEST_DIR)/*-test.el
+
+test-prep : build test-dep-1 test-dep-2 test-dep-3 test-autoloads test-travis test-tests
 
 test-batch :
 	@cd $(TEST_DIR)                                   && \
