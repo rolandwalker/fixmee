@@ -949,6 +949,7 @@ Only buffers in which `fixmee-mode' is active will be searched."
   (interactive "P")
   (fixmee-locate-all-notices)
   (when (and (not (memq last-command fixmee-navigation-commands))
+             (button-lock-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
   (cond
@@ -976,6 +977,7 @@ Only buffers in which `fixmee-mode' is active will be searched."
   (interactive "P")
   (fixmee-locate-all-notices)
   (when (and (not (memq last-command fixmee-navigation-commands))
+             (button-lock-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
   (cond
@@ -996,6 +998,7 @@ buffer by positional order.
 The urgency level of notices is ignored."
   (interactive "P")
   (when (and (not (memq last-command fixmee-navigation-commands))
+             (button-lock-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
   (fixmee-navigate-to-hit (fixmee-find-next-by-position (when (consp arg) (point-min)))))
@@ -1009,6 +1012,7 @@ buffer by positional order.
 The urgency level of notices is ignored."
   (interactive "P")
   (when (and (not (memq last-command fixmee-navigation-commands))
+             (button-lock-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
   (fixmee-navigate-to-hit (fixmee-find-previous-by-position (when (consp arg) (point-max)))))
