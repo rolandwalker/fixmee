@@ -465,7 +465,7 @@ Expressed as an element of `fixmee-notice-list'.")
   "A timer object for periodic cache invalidation.")
 
 (defvar fixmee-notice-list nil
-  "Global list of \"fixme\" notices.  Each element is a list (URGENCY BUFFER LOCATION).")
+  "Global list of \"fixme\" notices.  Each element is a list (URGENCY BUFFER LOCATION-START LOCATION-END).")
 
 (defvar fixmee-keyboard-navigation-commands  '(
                                                fixmee-goto-prevmost-urgent
@@ -942,7 +942,7 @@ is 'toggle."
                (not fixmee-less-feedback))
       (message "fixmee mode disabled")))))
 
-;;; global minor-mode setup
+;;; global minor-mode definition
 
 (define-globalized-minor-mode global-fixmee-mode fixmee-mode fixmee-maybe-turn-on
   :keymap fixmee-mode-global-map
