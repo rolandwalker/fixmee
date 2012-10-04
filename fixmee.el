@@ -488,6 +488,9 @@ Expressed as an element of `fixmee-notice-list'.")
                                                fixmee-mouse-navigation-commands)
   "List of interactive navigation commands.")
 
+(defvar fixmee-global-commands nil
+  "List of globally available commands.")
+
 (defvar fixmee-button nil
   "Buffer-local variable holding the `button-lock' button for \"fixme\" notices.")
 (make-variable-buffer-local 'fixmee-button)
@@ -498,6 +501,8 @@ Expressed as an element of `fixmee-notice-list'.")
 ;;; keymaps
 
 (defvar fixmee-mode-map (make-sparse-keymap) "Keymap for `fixmee-mode' minor-mode.")
+
+(defvar fixmee-mode-global-map (make-sparse-keymap) "Keymap for `global-fixmee-mode' global minor-mode.")
 
 (let ((smart-keys nil))
   (dolist (cmd fixmee-keyboard-navigation-commands)
@@ -516,6 +521,11 @@ Expressed as an element of `fixmee-notice-list'.")
         (define-key fixmee-mode-map (read-kbd-macro k) cmd))))
   (when smart-keys
     (smartrep-define-key fixmee-mode-map fixmee-smartrep-prefix smart-keys)))
+
+(dolist (cmd fixmee-global-commands)
+  (dolist (k (symbol-value (intern (concat (symbol-name cmd) "-keystrokes"))))
+    (define-key fixmee-mode-map        (read-kbd-macro k) cmd)
+    (define-key fixmee-mode-global-map (read-kbd-macro k) cmd)))
 
 ;;; lighter
 
@@ -935,6 +945,7 @@ is 'toggle."
 ;;; global minor-mode setup
 
 (define-globalized-minor-mode global-fixmee-mode fixmee-mode fixmee-maybe-turn-on
+  :keymap fixmee-mode-global-map
   :group 'fixmee)
 
 ;;; interactive commands
