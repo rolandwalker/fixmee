@@ -467,13 +467,25 @@ Expressed as an element of `fixmee-notice-list'.")
 (defvar fixmee-notice-list nil
   "Global list of \"fixme\" notices.  Each element is a list (URGENCY BUFFER LOCATION).")
 
-(defvar fixmee-navigation-commands  '(
-                                      fixmee                          ; alias for fixmee-goto-nextmost-urgent
-                                      fixmee-goto-prevmost-urgent
-                                      fixmee-goto-nextmost-urgent
-                                      fixmee-goto-previous-by-position
-                                      fixmee-goto-next-by-position
-                                      )
+(defvar fixmee-keyboard-navigation-commands  '(
+                                               fixmee-goto-prevmost-urgent
+                                               fixmee-goto-nextmost-urgent
+                                               fixmee-goto-previous-by-position
+                                               fixmee-goto-next-by-position
+                                               )
+  "List of interactive keyboard navigation commands.")
+
+(defvar fixmee-mouse-navigation-commands  '(
+                                            fixmee-mouse-goto-nextmost-urgent
+                                            fixmee-mouse-goto-prevmost-urgent
+                                            fixmee-mouse-goto-next-by-position
+                                            fixmee-mouse-goto-previous-by-position
+                                            )
+  "List of interactive mouse navigation commands.")
+
+(defvar fixmee-all-navigation-commands (append '(fixmee)   ; alias for fixmee-goto-nextmost-urgent
+                                               fixmee-keyboard-navigation-commands
+                                               fixmee-mouse-navigation-commands)
   "List of interactive navigation commands.")
 
 (defvar fixmee-button nil
@@ -488,7 +500,7 @@ Expressed as an element of `fixmee-notice-list'.")
 (defvar fixmee-mode-map (make-sparse-keymap) "Keymap for `fixmee-mode' minor-mode.")
 
 (let ((smart-keys nil))
-  (dolist (cmd (remq 'fixmee fixmee-navigation-commands))
+  (dolist (cmd fixmee-keyboard-navigation-commands)
     (dolist (k (symbol-value (intern (concat (symbol-name cmd) "-keystrokes"))))
       (if (and (featurep 'smartrep)
                (stringp fixmee-smartrep-prefix)
@@ -948,7 +960,7 @@ notice in all buffers.
 Only buffers in which `fixmee-mode' is active will be searched."
   (interactive "P")
   (fixmee-locate-all-notices)
-  (when (and (not (memq last-command fixmee-navigation-commands))
+  (when (and (not (memq last-command fixmee-all-navigation-commands))
              (button-lock-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
@@ -976,7 +988,7 @@ notice in all buffers.
 Only buffers in which `fixmee-mode' is active will be searched."
   (interactive "P")
   (fixmee-locate-all-notices)
-  (when (and (not (memq last-command fixmee-navigation-commands))
+  (when (and (not (memq last-command fixmee-all-navigation-commands))
              (button-lock-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
@@ -997,7 +1009,7 @@ buffer by positional order.
 
 The urgency level of notices is ignored."
   (interactive "P")
-  (when (and (not (memq last-command fixmee-navigation-commands))
+  (when (and (not (memq last-command fixmee-all-navigation-commands))
              (button-lock-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
@@ -1011,7 +1023,7 @@ buffer by positional order.
 
 The urgency level of notices is ignored."
   (interactive "P")
-  (when (and (not (memq last-command fixmee-navigation-commands))
+  (when (and (not (memq last-command fixmee-all-navigation-commands))
              (button-lock-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
