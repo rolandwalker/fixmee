@@ -1036,6 +1036,10 @@ The urgency level of notices is ignored."
 EVENT should be the mouse event which invoked the command."
   (interactive "e")
   (deactivate-mark)
+  (when (and (not (memq last-command fixmee-all-navigation-commands))
+             (button-lock-called-interactively-p 'interactive)
+             fixmee-push-mark)
+    (back-button-push-mark-local-and-global nil t))
   (goto-char (posn-point (event-start event)))
   (fixmee-goto-nextmost-urgent))
 
@@ -1045,6 +1049,10 @@ EVENT should be the mouse event which invoked the command."
 EVENT should be the mouse event which invoked the command."
   (interactive "e")
   (deactivate-mark)
+  (when (and (not (memq last-command fixmee-all-navigation-commands))
+             (button-lock-called-interactively-p 'interactive)
+             fixmee-push-mark)
+    (back-button-push-mark-local-and-global nil t))
   (goto-char (posn-point (event-start event)))
   (fixmee-goto-prevmost-urgent))
 
@@ -1054,6 +1062,10 @@ EVENT should be the mouse event which invoked the command."
 EVENT should be the mouse event which invoked the command."
   (interactive "e")
   (deactivate-mark)
+  (when (and (not (memq last-command fixmee-all-navigation-commands))
+             (button-lock-called-interactively-p 'interactive)
+             fixmee-push-mark)
+    (back-button-push-mark-local-and-global nil t))
   (goto-char (posn-point (event-start event)))
   (fixmee-goto-next-by-position))
 
@@ -1063,6 +1075,10 @@ EVENT should be the mouse event which invoked the command."
 EVENT should be the mouse event which invoked the command."
   (interactive "e")
   (deactivate-mark)
+  (when (and (not (memq last-command fixmee-all-navigation-commands))
+             (button-lock-called-interactively-p 'interactive)
+             fixmee-push-mark)
+    (back-button-push-mark-local-and-global nil t))
   (goto-char (posn-point (event-start event)))
   (fixmee-goto-previous-by-position))
 
