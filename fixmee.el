@@ -203,7 +203,6 @@
 (declare-function smartrep-define-key                     "smartrep.el")
 (declare-function back-button-push-mark                   "back-button.el")
 (declare-function back-button-push-mark-local-and-global  "back-button.el")
-(declare-function button-lock-called-interactively-p      "button-lock.el")
 (declare-function button-lock-unset-button                "button-lock.el")
 (declare-function button-lock-extend-binding              "button-lock.el")
 
@@ -558,6 +557,17 @@ Expressed as an element of `fixmee-notice-list'.")
 
 ;;;###autoload
 (defalias 'fixmee 'fixmee-goto-nextmost-urgent)
+
+;;; macros
+
+(defmacro fixmee-called-interactively-p (&optional kind)
+  "A backward-compatible version of `called-interactively-p'.
+
+Optional KIND is as documented at `called-interactively-p'
+in GNU Emacs 24.1 or higher."
+  (if (eq 0 (cdr (subr-arity (symbol-function 'called-interactively-p))))
+      '(called-interactively-p)
+    `(called-interactively-p ,kind)))
 
 ;;; compatibility functions
 
@@ -915,12 +925,12 @@ is 'toggle."
    (fixmee-mode
     (fixmee-button-setup 1)
     (fixmee-refresh-timer-setup)
-    (when (and (button-lock-called-interactively-p 'interactive)
+    (when (and (fixmee-called-interactively-p 'interactive)
                (not fixmee-less-feedback))
       (message "fixmee mode enabled")))
    (t
     (fixmee-button-setup -1)
-    (when (and (button-lock-called-interactively-p 'interactive)
+    (when (and (fixmee-called-interactively-p 'interactive)
                (not fixmee-less-feedback))
       (message "fixmee mode disabled")))))
 
@@ -972,7 +982,7 @@ Only buffers in which `fixmee-mode' is active will be searched."
   (interactive "P")
   (fixmee-locate-all-notices)
   (when (and (not (memq last-command fixmee-all-navigation-commands))
-             (button-lock-called-interactively-p 'interactive)
+             (fixmee-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
   (cond
@@ -1000,7 +1010,7 @@ Only buffers in which `fixmee-mode' is active will be searched."
   (interactive "P")
   (fixmee-locate-all-notices)
   (when (and (not (memq last-command fixmee-all-navigation-commands))
-             (button-lock-called-interactively-p 'interactive)
+             (fixmee-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
   (cond
@@ -1021,7 +1031,7 @@ buffer by positional order.
 The urgency level of notices is ignored."
   (interactive "P")
   (when (and (not (memq last-command fixmee-all-navigation-commands))
-             (button-lock-called-interactively-p 'interactive)
+             (fixmee-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
   (fixmee-navigate-to-hit (fixmee-find-next-by-position (when (consp arg) (point-min)))))
@@ -1035,7 +1045,7 @@ buffer by positional order.
 The urgency level of notices is ignored."
   (interactive "P")
   (when (and (not (memq last-command fixmee-all-navigation-commands))
-             (button-lock-called-interactively-p 'interactive)
+             (fixmee-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
   (fixmee-navigate-to-hit (fixmee-find-previous-by-position (when (consp arg) (point-max)))))
@@ -1048,7 +1058,7 @@ EVENT should be the mouse event which invoked the command."
   (interactive "e")
   (deactivate-mark)
   (when (and (not (memq last-command fixmee-all-navigation-commands))
-             (button-lock-called-interactively-p 'interactive)
+             (fixmee-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
   (goto-char (posn-point (event-start event)))
@@ -1061,7 +1071,7 @@ EVENT should be the mouse event which invoked the command."
   (interactive "e")
   (deactivate-mark)
   (when (and (not (memq last-command fixmee-all-navigation-commands))
-             (button-lock-called-interactively-p 'interactive)
+             (fixmee-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
   (goto-char (posn-point (event-start event)))
@@ -1074,7 +1084,7 @@ EVENT should be the mouse event which invoked the command."
   (interactive "e")
   (deactivate-mark)
   (when (and (not (memq last-command fixmee-all-navigation-commands))
-             (button-lock-called-interactively-p 'interactive)
+             (fixmee-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
   (goto-char (posn-point (event-start event)))
@@ -1087,7 +1097,7 @@ EVENT should be the mouse event which invoked the command."
   (interactive "e")
   (deactivate-mark)
   (when (and (not (memq last-command fixmee-all-navigation-commands))
-             (button-lock-called-interactively-p 'interactive)
+             (fixmee-called-interactively-p 'interactive)
              fixmee-push-mark)
     (back-button-push-mark-local-and-global nil t))
   (goto-char (posn-point (event-start event)))
