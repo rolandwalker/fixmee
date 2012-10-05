@@ -659,37 +659,42 @@ hook, and are ignored."
                    t))
         buf))))
 
-(defun fixmee-maybe-turn-on (&optional arg)
-  "Called by `global-fixmee-mode' to activate fixmee-mode in a buffer.
-
-`fixmee-mode' will be activated in every buffer, except
-
-   minibuffers
-   buffers with names that begin with space
-   buffers excluded by `fixmee-exclude-modes'
-   buffers excluded by `button-lock-exclude-modes'
-   buffers excluded by `fixmee-buffer-name-exclude-pattern'
-   buffers excluded by `button-lock-buffer-name-exclude-pattern'
-
-If called with a negative ARG, deactivate fixmee-mode in the buffer."
-  (callf or arg 1)
-  (when (or (< arg 0)
-            (fixmee-buffer-included-p (current-buffer)))
-    (fixmee-mode arg)))
-
 ;; functions that operate on or produce notices
-(defun fixmee-inside-notice-p (&optional pos)
-   "Whether POS is inside a \"fixme\" notice.
+(defun fixmee-measure-urgency (str-val)
+  "Counts how many times the trailing character is repeated on STR-VAL.
 
-POS defaults to the current point."
-   (callf or pos (point))
-   (fixmee-locate-all-notices)
-   (catch 'found
-     (dolist (hit fixmee-notice-list)
-       (when (and (eq (current-buffer) (cadr hit))
-                  (<= (caddr  hit) pos)
-                  (>  (cadddr hit) pos))
-         (throw 'found hit)))))
+Returns an integer, minimum of 1.  Case-insensitive.  The first two
+characters of STR-VAL are always ignored."
+  (let ((tailchar (downcase (aref str-val (1- (length str-val)))))
+        (counter 1))
+    (while (and (< counter (- (length str-val) 2))
+                (eq tailchar (downcase (aref str-val (- (length str-val) (1+ counter))))))
+      (incf counter))
+  counter))
+
+(defun fixmee-sort-notice-list ()
+  "Sort `fixmee-notice-list' by urgency."
+  (callf sort fixmee-notice-list #'(lambda (a b)
+                                     (cond
+                                       ((not (= (car a) (car b)))
+                                        (> (car a) (car b)))
+                                       ((not (eq (nth 1 a) (nth 1 b)))
+                                        (string< (buffer-name (nth 1 a)) (buffer-name (nth 1 b))))
+                                       (t
+                                        (< (nth 2 a) (nth 2 b)))))))
+
+(defun fixmee-notices-from-pristine-buffers () ;; optimization
+  "Return the subset of `fixmee-notice-list' elements found in pristine buffers."
+  (remove-if-not #'(lambda (hit)
+                     (and (buffer-name (cadr hit))
+                          (memq (cadr hit) fixmee-pristine-buffer-list)))
+                 fixmee-notice-list))
+
+(defun fixmee-notices-from-current-buffer ()
+  "Return the subset of `fixmee-notice-list' elements found in the current buffer."
+  (remove-if-not #'(lambda (hit)
+                     (eq (cadr hit) (current-buffer)))
+                 fixmee-notice-list))
 
 (defun fixmee-locate-all-notices ()
   "Search all open buffers for \"fixme\" notices, and store the results in `fixmee-notice-list'."
@@ -730,41 +735,18 @@ POS defaults to the current point."
         (error (fixmee-cache-invalidate)))
       (fixmee-sort-notice-list))))
 
-(defun fixmee-measure-urgency (str-val)
-  "Counts how many times the trailing character is repeated on STR-VAL.
+(defun fixmee-inside-notice-p (&optional pos)
+   "Whether POS is inside a \"fixme\" notice.
 
-Returns an integer, minimum of 1.  Case-insensitive.  The first two
-characters of STR-VAL are always ignored."
-  (let ((tailchar (downcase (aref str-val (1- (length str-val)))))
-        (counter 1))
-    (while (and (< counter (- (length str-val) 2))
-                (eq tailchar (downcase (aref str-val (- (length str-val) (1+ counter))))))
-      (incf counter))
-  counter))
-
-(defun fixmee-notices-from-pristine-buffers () ;; optimization
-  "Return the subset of `fixmee-notice-list' elements found in pristine buffers."
-  (remove-if-not #'(lambda (hit)
-                     (and (buffer-name (cadr hit))
-                          (memq (cadr hit) fixmee-pristine-buffer-list)))
-                 fixmee-notice-list))
-
-(defun fixmee-notices-from-current-buffer ()
-  "Return the subset of `fixmee-notice-list' elements found in the current buffer."
-  (remove-if-not #'(lambda (hit)
-                     (eq (cadr hit) (current-buffer)))
-                 fixmee-notice-list))
-
-(defun fixmee-sort-notice-list ()
-  "Sort `fixmee-notice-list' by urgency."
-  (callf sort fixmee-notice-list #'(lambda (a b)
-                                     (cond
-                                       ((not (= (car a) (car b)))
-                                        (> (car a) (car b)))
-                                       ((not (eq (nth 1 a) (nth 1 b)))
-                                        (string< (buffer-name (nth 1 a)) (buffer-name (nth 1 b))))
-                                       (t
-                                        (< (nth 2 a) (nth 2 b)))))))
+POS defaults to the current point."
+   (callf or pos (point))
+   (fixmee-locate-all-notices)
+   (catch 'found
+     (dolist (hit fixmee-notice-list)
+       (when (and (eq (current-buffer) (cadr hit))
+                  (<= (caddr  hit) pos)
+                  (>  (cadddr hit) pos))
+         (throw 'found hit)))))
 
 ;; internal navigation driver functions
 (defun fixmee-leave-current-notice (&optional reverse)
@@ -943,6 +925,24 @@ is 'toggle."
       (message "fixmee mode disabled")))))
 
 ;;; global minor-mode definition
+
+(defun fixmee-maybe-turn-on (&optional arg)
+  "Called by `global-fixmee-mode' to activate fixmee-mode in a buffer.
+
+`fixmee-mode' will be activated in every buffer, except
+
+   minibuffers
+   buffers with names that begin with space
+   buffers excluded by `fixmee-exclude-modes'
+   buffers excluded by `button-lock-exclude-modes'
+   buffers excluded by `fixmee-buffer-name-exclude-pattern'
+   buffers excluded by `button-lock-buffer-name-exclude-pattern'
+
+If called with a negative ARG, deactivate fixmee-mode in the buffer."
+  (callf or arg 1)
+  (when (or (< arg 0)
+            (fixmee-buffer-included-p (current-buffer)))
+    (fixmee-mode arg)))
 
 (define-globalized-minor-mode global-fixmee-mode fixmee-mode fixmee-maybe-turn-on
   :keymap fixmee-mode-global-map
