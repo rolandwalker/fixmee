@@ -449,6 +449,9 @@ The format for key sequences is as defined by `kbd'."
 
 ;;; variables
 
+(defvar fixmee-mode nil "Mode variable for `fixmee-mode'.")
+(make-variable-buffer-local 'fixmee-mode)
+
 (defvar fixmee-pristine-buffer-list nil
   "List of buffers unmodified since the last execution of `fixmee-locate-all-notices'.")
 
