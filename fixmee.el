@@ -554,7 +554,8 @@ Expressed as an element of `fixmee-notice-list'.")
                               (define-key map (read-kbd-macro (format "<mode-line> <down-mouse-%s>" fixmee-lighter-menu-mouse-button)) menu-map)
                               map) "Keymap for the `fixmee-mode' lighter.")
 
-(when (stringp fixmee-mode-lighter)
+(when (and (stringp fixmee-mode-lighter)
+           (> (length fixmee-mode-lighter) 0))
   (callf propertize fixmee-mode-lighter
                     fixmee-lighter-keymap-property fixmee-lighter-map
                     'help-echo (format "fixmee-mode: mouse-%s menu\nwheel down/up by urgency\nwheel M-down/M-up by position." fixmee-lighter-menu-mouse-button)))
