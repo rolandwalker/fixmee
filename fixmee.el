@@ -497,8 +497,11 @@ Expressed as an element of `fixmee-notice-list'.")
   "Buffer-local variable holding the `button-lock' button for \"fixme\" notices.")
 (make-variable-buffer-local 'fixmee-button)
 
-(defvar fixmee-lighter-context-menu-keystrokes "<mode-line> <down-mouse-1>"
-  "Key sequence to invoke the modeline context menu.")
+(defvar fixmee-lighter-menu-mouse-button 1
+  "Which mouse button invokes the modeline context menu.")
+
+(defvar fixmee-lighter-keymap-property 'keymap
+  "Which property sets the lighter keymap")
 
 ;;; keymaps
 
@@ -548,13 +551,13 @@ Expressed as an element of `fixmee-notice-list'.")
                               (define-key map (kbd "<mode-line> <mouse-5>"      )      'fixmee-goto-nextmost-urgent)
                               (define-key map (kbd "<mode-line> <M-mouse-4>"    )      'fixmee-goto-previous-by-position)
                               (define-key map (kbd "<mode-line> <M-mouse-5>"    )      'fixmee-goto-next-by-position)
-                              (define-key map (read-kbd-macro fixmee-lighter-context-menu-keystrokes) menu-map)
+                              (define-key map (read-kbd-macro (format "<mode-line> <down-mouse-%s>" fixmee-lighter-menu-mouse-button)) menu-map)
                               map) "Keymap for the `fixmee-mode' lighter.")
 
 (when (stringp fixmee-mode-lighter)
-      (callf propertize fixmee-mode-lighter 'local-map fixmee-lighter-map
-                                            'keymap fixmee-lighter-map
-                                            'help-echo "fixmee-mode: mouse-1 menu\nwheel down/up by urgency\nwheel M-down/M-up by position."))
+  (callf propertize fixmee-mode-lighter
+                    fixmee-lighter-keymap-property fixmee-lighter-map
+                    'help-echo (format "fixmee-mode: mouse-%s menu\nwheel down/up by urgency\nwheel M-down/M-up by position." fixmee-lighter-menu-mouse-button)))
 
 ;;; aliases and fsets
 
