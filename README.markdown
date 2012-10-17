@@ -66,6 +66,11 @@ The default key bindings are
 	M-n    fixmee-goto-next-by-position      ; only when the point is
 	M-p    fixmee-goto-previous-by-position  ; inside a fixme notice
 
+To constrain the nextmost/prevmost-urgent commands to the current
+buffer only, use a universal prefix argument, eg
+
+	C-u C-c f
+
 When the `smartrep` package is installed, the `C-c` prefix need not
 be used for consecutive fixmee-mode keyboard commands.  Instead, just
 keep pressing `f` (or whichever key you set in customize).
