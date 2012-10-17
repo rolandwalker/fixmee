@@ -14,6 +14,10 @@ Quickstart
 (global-fixmee-mode 1)
  
 ;; right-click on the word "fixme" in a comment
+ 
+;; for next-error support:
+;;
+;; M-x fixmee-view-listing RET
 ```
 
 fixmee-mode
@@ -47,6 +51,10 @@ or
 
 	roll the mouse wheel when hovering over the text "fixm" in the modeline.
 
+or
+
+	execute `fixmee-view-listing` to navigate using `next-error` conventions.
+
 Key Bindings
 ------------
 
@@ -54,6 +62,7 @@ The default key bindings are
 
 	C-c f  fixmee-goto-nextmost-urgent
 	C-c F  fixmee-goto-prevmost-urgent
+	C-c v  fixmee-view-listing
 	M-n    fixmee-goto-next-by-position      ; only when the point is
 	M-p    fixmee-goto-previous-by-position  ; inside a fixme notice
 
@@ -83,9 +92,9 @@ Compatibility and Requirements
 
 	GNU Emacs version 24.3-devel     : yes, at the time of writing
 	GNU Emacs version 24.1 & 24.2    : yes
-	GNU Emacs version 23.3           : yes
+	GNU Emacs version 23.3           : unknown
 	GNU Emacs version 22.3 and lower : no
 
-Requires [button-lock.el](http://github.com/rolandwalker/button-lock)
+Requires: [button-lock.el](http://github.com/rolandwalker/button-lock), tabulated-list.el
 
-Uses if present: [smartrep.el](http://github.com/myuhe/smartrep.el), [nav-flash.el](http://github.com/rolandwalker/nav-flash), [back-button.el](http://github.com/rolandwalker/back-button)
+Uses if present: [smartrep.el](http://github.com/myuhe/smartrep.el), [nav-flash.el](http://github.com/rolandwalker/nav-flash), [back-button.el](http://github.com/rolandwalker/back-button), [string-utils.el](http://github.com/rolandwalker/string-utils)

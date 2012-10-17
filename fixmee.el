@@ -9,7 +9,7 @@
 ;; Last-Updated: 14 Sep 2012
 ;; EmacsWiki: FixmeeMode
 ;; Keywords: navigation, convenience
-;; Package-Requires: ((button-lock "0.9.8") (nav-flash "1.0.0") (back-button "0.6.0") (smartrep "0.0.3"))
+;; Package-Requires: ((button-lock "0.9.8") (nav-flash "1.0.0") (back-button "0.6.0") (smartrep "0.0.3") (string-utils "0.0.6") (tabulated-list "0"))
 ;;
 ;; Simplified BSD License
 ;;
@@ -22,6 +22,9 @@
 ;;     (global-fixmee-mode 1)
 ;;
 ;;     right-click on the word "fixme" in a comment
+;;
+;;     ;; for `next-error' support
+;;     M-x fixmee-view-listing RET
 ;;
 ;; Explanation
 ;;
@@ -53,12 +56,18 @@
 ;;    roll the mouse wheel when hovering over the text "fixm"
 ;;    in the modeline.
 ;;
+;; or
+;;
+;;    execute `fixmee-view-listing' to navigate using
+;;    `next-error' conventions.
+;;
 ;; Key Bindings
 ;;
 ;; The default key bindings are
 ;;
 ;;     C-c f  `fixmee-goto-nextmost-urgent'
 ;;     C-c F  `fixmee-goto-prevmost-urgent'
+;;     C-c v   `fixmee-view-listing'
 ;;     M-n    `fixmee-goto-next-by-position'      ; only when the point is
 ;;     M-p    `fixmee-goto-previous-by-position'  ; inside a fixme notice
 ;;
@@ -96,12 +105,13 @@
 ;;
 ;;     GNU Emacs version 24.3-devel     : yes, at the time of writing
 ;;     GNU Emacs version 24.1 & 24.2    : yes
-;;     GNU Emacs version 23.3           : yes
+;;     GNU Emacs version 23.3           : unknown
 ;;     GNU Emacs version 22.3 and lower : no
 ;;
-;;     Requires button-lock.el
+;;     Requires: button-lock.el, tabulated-list.el
 ;;
-;;     Uses if present: smartrep.el, nav-flash.el, back-button.el
+;;     Uses if present: smartrep.el, nav-flash.el, back-button.el,
+;;                      string-utils.el
 ;;
 ;; Bugs
 ;;
@@ -120,13 +130,31 @@
 ;;     associated with the frame at the time the global mode check
 ;;     calls fixmee-maybe-turn-on.
 ;;
+;;     Bug in tabulated-list: position of point is not maintained
+;;     when sort headers are clicked while a different window is
+;;     selected.
+;;
 ;; TODO
 ;;
-;;     Better feedback messages for end-of-list and start-of-list.
+;;     Push mark for navigation which happens from the listview
 ;;
-;;     Integrate with next-error (make a separate buffer showing hits) -
-;;     for first pass at this just send regexp to occur, second pass
-;;     build a buffer from the contents of fixmee-notice-list.
+;;     There is no need for fixmee--listview-mode to be an interactive
+;;     command.
+;;
+;;     Context menu on lighter for listview mode.
+;;
+;;     Consider allowing all navigation commands to update the listview
+;;     buffer (currently only next-error commands do so)
+;;
+;;     Display fully fontified context lines in listview buffer - some
+;;     lines have fontification, seemingly at random.  Disabling
+;;     whitespace trimming and excluded properties had no effect.
+;;
+;;     Multi-line context in listview buffer - tabulated-list accepts
+;;     newlines, but data then runs out of the column on the next
+;;     line.  Would need to pad to match column position.
+;;
+;;     Better feedback messages for end-of-list and start-of-list.
 ;;
 ;;     Bookmark integration? (implicit bookmarking on notices).
 ;;
@@ -193,18 +221,33 @@
 (require 'nav-flash   nil t)
 (require 'back-button nil t)
 (require 'smartrep    nil t)
+(require 'string-utils   nil t)
 
 (autoload 'button-lock-mode       "button-lock"  "Toggle button-lock-mode, a minor mode for making text clickable.")
 (autoload 'button-lock-set-button "button-lock"  "Attach mouse actions to text via `font-lock-mode'.")
+(autoload 'tabulated-list-mode    "tabulated-list" "Generic major mode for browsing a list of items.")
+
+;;; declarations
 
 (declare-function smartrep-define-key                     "smartrep.el")
 (declare-function back-button-push-mark                   "back-button.el")
 (declare-function back-button-push-mark-local-and-global  "back-button.el")
 (declare-function button-lock-unset-button                "button-lock.el")
 (declare-function button-lock-extend-binding              "button-lock.el")
+(declare-function string-utils-squeeze-filename           "string-utils.el")
+(declare-function string-utils-trim-whitespace            "string-utils.el")
+(declare-function tabulated-list-get-id                   "tabulated-list.el")
+(declare-function tabulated-list-init-header              "tabulated-list.el")
+(declare-function tabulated-list-print                    "tabulated-list.el")
+(declare-function tabulated-list-revert                   "tabulated-list.el")
+(declare-function tabulated-list-print-entry              "tabulated-list.el")
 
 (eval-when-compile
-  ;; declarations for byte compiler
+  (defvar tabulated-list-sort-key)
+  (defvar tabulated-list-format)
+  (defvar tabulated-list-padding)
+  (defvar tabulated-list-entries)
+  (defvar tabulated-list-printer)
   (defvar button-lock-mode))
 
 ;;; customizable variables
@@ -280,6 +323,7 @@ a series of `fixmee-mode' navigation commands."
                                   mime/viewer-mode
                                   rmail-mode
                                   term-mode
+                                  fixmee--listview-mode
                                   )
   "Fixmee will not scan a buffer if its major mode is included in this list."
   :type '(repeat symbol)
@@ -378,6 +422,19 @@ notice.
 
 Note that \"previous\" here means previous-by-urgency and not
 by position.
+
+The format for key sequences is as defined by `kbd'."
+   :type '(repeat string)
+   :group 'fixmee-keys)
+
+(defcustom fixmee-view-listing-keystrokes '("C-c v")
+  "Key sequences to run `fixmee-view-listing'.
+
+The listview buffer displays all current \"fixme\" notices in a
+sortable tabulated list, and provides `next-error' support.
+
+These keys are in effect whenever `fixmee-global-mode' is active,
+or when `fixmee-mode' is active in a buffer.
 
 The format for key sequences is as defined by `kbd'."
    :type '(repeat string)
@@ -490,7 +547,7 @@ Expressed as an element of `fixmee-notice-list'.")
                                                fixmee-mouse-navigation-commands)
   "List of interactive navigation commands.")
 
-(defvar fixmee-global-commands nil
+(defvar fixmee-global-commands '(fixmee-view-listing)
   "List of globally available commands.")
 
 (defvar fixmee-button nil
@@ -502,6 +559,46 @@ Expressed as an element of `fixmee-notice-list'.")
 
 (defvar fixmee-lighter-keymap-property 'keymap
   "Which property sets the lighter keymap.")
+
+;; fixmee--listview-mode variables
+
+(defvar fixmee--listview-mode nil "Mode variable for `fixmee--listview-mode'.")
+(make-variable-buffer-local 'fixmee--listview-mode)
+
+(defvar fixmee--listview-buffer-name "*fixmee notices*"
+  "The name of the buffer used to show a listview of all fixmee notices.")
+
+(defvar fixmee--listview-arrow-id nil
+  "The `tabulated-list-mode' id associated with the overlay arrow.")
+(make-variable-buffer-local 'fixmee--listview-arrow-id)
+
+(defvar fixmee--listview-find-notice-hook nil
+  "Hook to run when viewing a notice from a `fixmee--listview-mode' buffer.")
+
+(defvar fixmee--listview-line-format '[("Buffer"  35 fixmee--listview-name-sorter)
+                                       ("Urgency" 10 fixmee--listview-urgency-sorter)
+                                       ("Context" 80 fixmee--listview-context-sorter)]
+  "Tabulated list format for `fixmee--listview-mode' buffers.")
+
+(defvar fixmee--listview-excluded-properties '(
+                                               category
+                                               field
+                                               follow-link
+                                               fontified
+                                               help-echo
+                                               intangible
+                                               invisible
+                                               keymap
+                                               local-map
+                                               mouse-face
+                                               read-only
+                                               yank-handler
+                                               )
+  "Properties removed from text before display in `fixmee--listview-mode' buffers.")
+
+(defvar fixmee--listview-local-only nil
+  "If non-nil, `fixmee--listview-mode' shows notices from the current buffer only.")
+(make-variable-buffer-local 'fixmee--listview-local-only)
 
 ;;; keymaps
 
@@ -532,12 +629,40 @@ Expressed as an element of `fixmee-notice-list'.")
     (define-key fixmee-mode-map        (read-kbd-macro k) cmd)
     (define-key fixmee-mode-global-map (read-kbd-macro k) cmd)))
 
+(defvar fixmee--listview-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "<mouse-2>") 'fixmee-listview-mouse-goto-notice)
+    (define-key map (kbd "C-c C-c"  ) 'fixmee-listview-goto-notice)
+    (define-key map (kbd "<return>" ) 'fixmee-listview-goto-notice)
+    (define-key map (kbd "<SPC>"    ) 'fixmee-listview-view-notice)
+    (define-key map (kbd "v"        ) 'fixmee-listview-view-notice)
+    (define-key map (kbd "l"        ) 'fixmee-listview-toggle-local-only)
+    (define-key map (kbd "n"        ) 'next-error-no-select)
+    (define-key map (kbd "p"        ) 'previous-error-no-select)
+    (define-key map (kbd "<tab>"    ) 'next-error-no-select)
+    (define-key map (kbd "<backtab>") 'previous-error-no-select)
+    (define-key map (kbd "M-n"      ) 'next-error-no-select)
+    (define-key map (kbd "M-p"      ) 'previous-error-no-select)
+    (define-key map (kbd "C-c C-f"  ) 'next-error-follow-minor-mode)
+    (define-key map (kbd "q"        ) 'quit-window)
+    (define-key map (kbd "Q"        ) 'fixmee-listview-quit)
+    (define-key map (kbd "{"        ) 'fixmee-listview-previous-buffer)
+    (define-key map (kbd "}"        ) 'fixmee-listview-next-buffer)
+    (define-key map (kbd "M-{"      ) 'fixmee-listview-previous-buffer)
+    (define-key map (kbd "M-}"      ) 'fixmee-listview-next-buffer)
+    map)
+  "Keymap for `fixmee--listview-mode' buffers.")
+(put 'fixmee-listview-goto-notice :advertised-binding (kbd "<return>"))
+(put 'fixmee-listview-view-notice :advertised-binding (kbd "<SPC>"))
+
 ;;; lighter
 
 (defvar fixmee-lighter-map  (let ((map (make-sparse-keymap))
                                   (menu-map (make-sparse-keymap "Fixmee Mode")))
                               (define-key menu-map [customize]                         '(menu-item "Customize"      (lambda (e) (interactive "e") (customize-group 'fixmee))))
                               (define-key menu-map [turn-off-fixmee-mode]              '(menu-item "Turn Off Fixmee Mode"  fixmee-mode))
+                              (define-key menu-map [separator-2]                       '(menu-item "--"))
+                              (define-key menu-map [fixmee-view-listing]               '(menu-item "View Listing of Notices" fixmee-view-listing))
                               (define-key menu-map [separator-1]                       '(menu-item "--"))
                               (define-key menu-map [fixmee-goto-previous-by-position]  '(menu-item "Previous Fixme By Position" fixmee-goto-previous-by-position))
                               (define-key menu-map [fixmee-goto-next-by-position]      '(menu-item "Next Fixme By Position" fixmee-goto-next-by-position))
@@ -610,6 +735,23 @@ an exact duplicate of the current topmost mark onto `global-mark-ring'."
     (when (> (length global-mark-ring) global-mark-ring-max)
       (move-marker (car (nthcdr global-mark-ring-max global-mark-ring)) nil)
       (setcdr (nthcdr (1- global-mark-ring-max) global-mark-ring) nil)))))
+
+(unless (fboundp 'string-utils-trim-whitespace)
+  (defun string-utils-trim-whitespace (str-val &optional whitespace-type multi-line)
+  "Return STR-VAL with leading and trailing whitespace removed.
+
+WHITESPACE-TYPE is ignored.
+
+If optional MULTI-LINE is set, trim spaces at starts and
+ends of all lines throughout STR-VAL."
+  (let* ((string-utils-whitespace " \t\n\r\f")
+         (whitespace-regexp (concat "[" string-utils-whitespace "]"))
+         (start-pat (if multi-line "^" "\\`"))
+         (end-pat   (if multi-line "$" "\\'")))
+    (save-match-data
+      (replace-regexp-in-string (concat start-pat whitespace-regexp "+") ""
+         (replace-regexp-in-string (concat whitespace-regexp "+" end-pat) ""
+            str-val))))))
 
 ;;; utility functions
 
@@ -911,6 +1053,139 @@ If called with negative ARG, remove the buttons."
       (dolist (key fixmee-within-notice-goto-previous-by-position-keystrokes)
         (button-lock-extend-binding fixmee-button 'fixmee-goto-previous-by-position nil key)))))
 
+;; fixmee--listview-mode utility functions
+(defun fixmee--listview-name-sorter (a b)
+  "Sort `fixmee--listview-mode' buffer lines by name."
+  (save-match-data
+    (let* ((string-a (ignore-errors (replace-regexp-in-string ":\\([0-9]+\\)\\'" "" (car (aref (cadr a) 0)))))
+           (string-b (ignore-errors (replace-regexp-in-string ":\\([0-9]+\\)\\'" "" (car (aref (cadr b) 0)))))
+           (line-a   (ignore-errors (string-to-number (replace-regexp-in-string "\\`.*:\\([0-9]+\\)\\'" "\\1" (car (aref (cadr a) 0))))))
+           (line-b   (ignore-errors (string-to-number (replace-regexp-in-string "\\`.*:\\([0-9]+\\)\\'" "\\1" (car (aref (cadr b) 0)))))))
+      (cond
+        ((string< string-a string-b)
+         t)
+        ((and (string= string-a string-b)
+              line-a
+              line-b
+              (< line-a line-b))
+         t)
+        (t
+         nil)))))
+
+(defun fixmee--listview-urgency-sorter (a b)
+  "Sort `fixmee--listview-mode' buffer lines by urgency."
+  (cond
+    ((< (string-to-number (aref (cadr a) 1))
+        (string-to-number (aref (cadr b) 1)))
+     t)
+    ((= (string-to-number (aref (cadr a) 1))
+        (string-to-number (aref (cadr b) 1)))
+     (if (cdr tabulated-list-sort-key)
+         (fixmee--listview-name-sorter b a)
+       (fixmee--listview-name-sorter a b)))
+    (t
+     nil)))
+
+(defun fixmee--listview-context-sorter (a b)
+  "Sort `fixmee--listview-mode' buffer lines by context."
+  (string< (aref (cadr a) 2)
+           (aref (cadr b) 2)))
+
+(defun fixmee--listview-max-line-number-width (notice-list)
+  "Return the maximum width needed to print line numbers of buffers in NOTICE-LIST."
+  (let ((maxbuf (nth 1 (car notice-list))))
+    (dolist (buf (delete-dups (mapcar #'(lambda (x) (nth 1 x)) notice-list)))
+      (when (> (buffer-size buf) (buffer-size maxbuf))
+        (setq maxbuf buf)))
+    (with-current-buffer maxbuf
+      (length (number-to-string (1+ (count-lines 1 (point-max))))))))
+
+(defun fixmee--listview-buffer-plus-line-formatted (buf pos len)
+  "Return a formatted string containing BUF and line number for POS.
+
+BUF is intelligently truncated if its length is longer than LEN."
+  (save-match-data
+    (let ((line (with-current-buffer buf (count-lines 1 pos)))
+          (ellipsis "..."))
+      (when (bufferp buf)
+        (setq buf (buffer-name buf)))
+      (when (> (length buf) len)
+        (if (fboundp 'string-utils-squeeze-filename)
+            (callf string-utils-squeeze-filename buf len)
+          (callf substring buf (- len (length ellipsis)))))
+      (concat buf (format ":%s" line)))))
+
+(defun fixmee--listview-render-entries (notice-list)
+  "Convert NOTICE-LIST to the format expected by `tabulated-list'.
+
+NOTICE-LIST is a list in the format of `fixmee-notice-list'."
+  (when notice-list
+    (let* ((line-num-width (fixmee--listview-max-line-number-width notice-list))
+           (buffer-col-width (nth 1 (aref fixmee--listview-line-format 0)))
+           (tablist nil))
+      (dolist (hit notice-list)
+        (destructuring-bind (urgency buf start end) hit
+          (push (list
+                 ;; id
+                 (list buf start)
+                 ;; columns
+                 (vector (list (fixmee--listview-buffer-plus-line-formatted buf start (- buffer-col-width line-num-width 2))
+                               'face 'link
+                               'follow-link t
+                               'action 'fixmee-listview-mouse-goto-notice)
+                         (number-to-string urgency)
+                         (with-current-buffer buf
+                           (save-excursion
+                             (goto-char start)
+                             (let ((str-val (string-utils-trim-whitespace
+                                             (buffer-substring (line-beginning-position) (line-end-position)))))
+                               (remove-list-of-text-properties 0 (length str-val) fixmee--listview-excluded-properties str-val)
+                               str-val)))))
+                tablist)))
+      tablist)))
+
+(defun fixmee--listview-find-current-notice ()
+  "Get the id for the fixmee notice at the current line in `fixmee--listview-mode'."
+  (assert (eq major-mode 'fixmee--listview-mode)
+          nil "Not in a fixmee--listview-mode buffer")
+  (let ((id (tabulated-list-get-id)))
+    (assert id nil "No notice on this line")
+    (assert (buffer-live-p (car id)) nil "Buffer for this notice no longer active")
+    id))
+
+(defun fixmee--listview-print-entry-function (id cols)
+  "Call `tabulated-list-print-entry' and restore the arrow overlay if needed.
+
+ID and COLS are as documented at `tabulated-list-print-entry'."
+  (tabulated-list-print-entry id cols)
+  (when fixmee--listview-arrow-id
+    (save-excursion
+      (forward-line -1)
+      (when (equal fixmee--listview-arrow-id (tabulated-list-get-id))
+        (setq overlay-arrow-position (copy-marker (line-beginning-position)))))))
+
+(defun fixmee--listview-revert-function (&optional _ignore1 _ignore2)
+  "Handle revert in `fixmee--listview-mode' buffers."
+  (when (eq major-mode 'fixmee--listview-mode)
+    (fixmee-locate-all-notices)
+    (set (make-local-variable 'tabulated-list-entries)
+         (fixmee--listview-render-entries fixmee-notice-list))
+    (setq mode-line-process (if fixmee--listview-local-only "[local]" nil))
+    (when fixmee--listview-local-only
+      ;; todo this is a bit wrong in that the user could be looking
+      ;;      at another buffer which is not in fixmee-mode.  But
+      ;;      `other-buffer' doesn't deliver anything useful.
+      (let ((other-buf (car
+                        (remove-if-not #'(lambda (buf)
+                                           (buffer-local-value 'fixmee-mode buf))
+                                       (delq (current-buffer) (buffer-list))))))
+        (callf2 remove-if-not #'(lambda (entry)
+                                  (eq (caar entry) other-buf))
+                tabulated-list-entries)))
+    (unless tabulated-list-entries
+      (setq tabulated-list-entries '(((nil nil) ["<no matches found>" "" ""]))))
+    (tabulated-list-revert)))
+
 ;;; minor mode definition
 
 (define-minor-mode fixmee-mode
@@ -979,6 +1254,31 @@ If called with a negative ARG, deactivate fixmee-mode in the buffer."
   :group 'fixmee)
 
 (add-hook 'global-fixmee-mode-hook 'fixmee-mode-maybe-global-teardown)
+
+;;; listview buffer major-mode definition
+
+(put 'fixmee--listview-mode 'mode-class 'special)
+(define-derived-mode fixmee--listview-mode tabulated-list-mode "Fixmee Listview"
+  "Major mode for browsing fixmee notices.
+\\<fixmee--listview-mode-map>Move point to any notice in this buffer, then use
+\\[fixmee-listview-goto-notice] to view that notice.
+Alternatively, click \\[fixmee-listview-mouse-goto-notice].
+
+\\{fixmee--listview-mode-map}"
+  :group 'fixmee
+  (set (make-local-variable 'revert-buffer-function) 'fixmee--listview-revert-function)
+  (set (make-local-variable 'next-error-function) 'fixmee--listview-next-error-function)
+  (set (make-local-variable 'tabulated-list-printer) 'fixmee--listview-print-entry-function)
+  (setq next-error-last-buffer (current-buffer))
+  (make-local-variable 'overlay-arrow-position)
+  (set (make-local-variable 'overlay-arrow-string) "")
+  (setq next-error-overlay-arrow-position nil)
+  (add-hook 'kill-buffer-hook
+            (lambda () (setq next-error-overlay-arrow-position nil)) nil t)
+  (setq tabulated-list-format fixmee--listview-line-format)
+  (setq tabulated-list-padding 2)
+  (setq tabulated-list-sort-key (cons "Urgency" t))
+  (tabulated-list-init-header))
 
 ;;; interactive commands
 
@@ -1134,6 +1434,183 @@ EVENT should be the mouse event which invoked the command."
     (back-button-push-mark-local-and-global nil t))
   (goto-char (posn-point (event-start event)))
   (fixmee-goto-previous-by-position))
+
+;; listview next-error support
+
+(defun fixmee-listview-goto-notice ()
+  "Go to the fixmee notice on the current line."
+  (interactive)
+  (let ((buf (get-buffer fixmee--listview-buffer-name)))
+    (assert buf nil "No current fixmee--listview-mode buffer.")
+    (with-current-buffer buf
+      (let ((id (fixmee--listview-find-current-notice))
+            (from-fixmee-listview-window (eq buf (window-buffer (selected-window))))
+            (fixmee-listview-window (get-buffer-window (current-buffer) t)))
+        (when id
+          (unless fixmee-listview-window
+            (with-selected-window (selected-window)
+              (pop-to-buffer buf)
+              (setq fixmee-listview-window (get-buffer-window (current-buffer) t))))
+          (when fixmee-listview-window
+            (set-window-point fixmee-listview-window (point)))
+          (setq overlay-arrow-position (copy-marker (line-beginning-position)))
+          (setq fixmee--listview-arrow-id (tabulated-list-get-id))
+          (if from-fixmee-listview-window
+              (switch-to-buffer-other-window (car id))
+            (switch-to-buffer (car id)))
+          (goto-char (cadr id))
+          (run-hooks 'fixmee--listview-find-notice-hook))))))
+
+;; don't know why this should be interactive, but compilation-mode has it that way
+(defun fixmee--listview-next-error-function (&optional arg reset)
+  "Move to the ARGth next match in a `fixmee--listview-mode' buffer.
+
+ARG defaults to 1.
+
+When RESET is non-nil, move to the first match in the error
+buffer."
+  (interactive "p")
+  (with-current-buffer
+      (if (next-error-buffer-p (current-buffer))
+          (current-buffer)
+        (next-error-find-buffer nil nil
+                                #'(lambda ()
+                                    (eq major-mode 'fixmee--listview-mode))))
+      (let ((orig-pos (point)))
+        (goto-char (cond
+                     (reset
+                      (point-min))
+                     ((< arg 0)
+                      (line-beginning-position))
+                     ((> arg 0)
+                      (line-end-position))
+                     (t
+                      (point))))
+        (unless reset
+          (when (or (> (abs (forward-line arg)) 0)
+                    (not (tabulated-list-get-id)))
+            (goto-char orig-pos)
+            (error "No more matches")))
+        (fixmee-listview-goto-notice))))
+
+;; listview interactive commands
+
+(defun fixmee-listview-view-notice ()
+  "View the fixmee notice on the current line.
+
+This command does not change the current window."
+  (interactive)
+  (next-error-no-select 0))
+
+;;;###autoload
+(defun fixmee-view-listing (&optional arg)
+  "View fixmee notices in a `fixmee--listview-mode' buffer.
+
+If the listview buffer currently exists, pop to it; otherwise
+create it.
+
+With universal prefix ARG, always reset the listview buffer to
+defaults and regenerate."
+  (interactive "P")
+  (let ((buf (get-buffer fixmee--listview-buffer-name)))
+    (when (and (buffer-live-p buf)
+               (consp arg))
+      (kill-buffer buf)
+      (setq buf nil))
+    (unless (buffer-live-p buf)
+      (setq buf (get-buffer-create fixmee--listview-buffer-name))
+      (with-current-buffer buf
+        (setq fixmee--listview-local-only nil)
+        (fixmee--listview-mode)))
+    (pop-to-buffer buf)
+    (fixmee--listview-revert-function)))
+
+(defun fixmee-listview-toggle-local-only ()
+  "Toggle whether to view notices only from a single buffer."
+  (interactive)
+  (let ((buf (get-buffer fixmee--listview-buffer-name)))
+    (assert buf nil "No current fixmee--listview-mode buffer.")
+    (with-current-buffer buf
+      (callf not fixmee--listview-local-only)
+      (fixmee--listview-revert-function))))
+
+(defun fixmee-listview-previous-error (&optional arg)
+  "Move to the ARGth previous match in a `fixmee--listview-mode' buffer.
+
+ARG defaults to 1."
+  (interactive "p")
+  (fixmee--listview-next-error-function (- arg)))
+
+(defun fixmee-listview-next-buffer (&optional arg)
+  "Skip to the ARGth next buffer listed in a `fixmee--listview-mode' buffer.
+
+ARG defaults to 1.
+
+If the listview is not sorted per-buffer, considers each block of
+contiguous identical buffers separately."
+  (interactive "p")
+  (with-current-buffer
+      (if (next-error-buffer-p (current-buffer))
+          (current-buffer)
+        (next-error-find-buffer nil nil
+                                #'(lambda ()
+                                    (eq major-mode 'fixmee--listview-mode))))
+      (let* ((orig-pos (point))
+             (orig-id (tabulated-list-get-id))
+             (orig-buf (car orig-id))
+             (id nil)
+             (buf nil))
+        (unless orig-id
+          (while (and (not (if (< arg 0) (bobp) (eobp)))
+                      (not (tabulated-list-get-id)))
+            (forward-line (signum arg)))
+          (unless (tabulated-list-get-id)
+            (goto-char orig-pos)
+            (error "No more buffers"))
+          (setq arg (* (signum arg) (1- (abs arg)))))
+        (dotimes (i (abs arg))
+          (setq id (tabulated-list-get-id))
+          (setq buf (car id))
+          (while (and buf
+                      (not (if (< arg 0) (bobp) (eobp)))
+                      (tabulated-list-get-id)
+                      (eq buf (car (tabulated-list-get-id))))
+            (forward-line (signum arg)))
+          (when (or (not (tabulated-list-get-id))
+                    (eq buf (car (tabulated-list-get-id))))
+            (goto-char orig-pos)
+            (error "No more buffers")))
+        (when (or (not (tabulated-list-get-id))
+                  (eq orig-buf (car (tabulated-list-get-id))))
+          (goto-char orig-pos)
+          (error "No more buffers")))))
+
+(defun fixmee-listview-previous-buffer (&optional arg)
+  "Skip to the ARGth previous buffer listed in a `fixmee--listview-mode' buffer.
+
+ARG defaults to 1.
+
+If the listview is not sorted per-buffer, considers each block of
+contiguous identical buffers separately."
+  (interactive "p")
+  (fixmee-listview-next-buffer (- arg)))
+
+(defun fixmee-listview-mouse-goto-notice (event)
+  "Go to the fixmee notice on the current line using the mouse.
+
+EVENT is the current mouse event."
+  (interactive "e")
+  (posn-set-point (event-end last-nonmenu-event))
+  (fixmee-listview-goto-notice))
+
+(defun fixmee-listview-quit (&optional buf)
+  "Delete window associated with buffer BUF and kill BUF."
+  (interactive)
+  (callf or buf (get-buffer fixmee--listview-buffer-name))
+  (when (buffer-live-p buf)
+    (when (get-buffer-window buf)
+      (ignore-errors (delete-window (get-buffer-window buf))))
+    (kill-buffer buf)))
 
 (provide 'fixmee)
 
