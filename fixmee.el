@@ -449,6 +449,9 @@ The format for key sequences is as defined by `kbd'."
 (defvar fixmee-mode nil "Mode variable for `fixmee-mode'.")
 (make-variable-buffer-local 'fixmee-mode)
 
+(defvar global-fixmee-mode nil
+  "Mode variable for `global-fixmee-mode'.")
+
 (defvar fixmee-pristine-buffer-list nil
   "List of buffers unmodified since the last execution of `fixmee-locate-all-notices'.")
 
@@ -611,18 +614,21 @@ an exact duplicate of the current topmost mark onto `global-mark-ring'."
 ;;; utility functions
 
 ;; general functions
-(defun fixmee-refresh-timer-setup ()
+(defun fixmee-refresh-timer-setup (&optional arg)
   "Set up a timer to invalidate caches.
+
+When optional ARG is less than 0, turn off timer.
 
 This should help cover up various minor bugs, such as not
 invalidating the cache when the regexp is changed."
   (when (timerp fixmee-cache-refresh-timer)
     (cancel-timer fixmee-cache-refresh-timer)
     (setq fixmee-cache-refresh-timer nil))
+  (unless (< arg 0)
   (when fixmee-cache-refresh-interval
     (let ((secs (truncate (* 60 fixmee-cache-refresh-interval))))
       (when (> secs 0)
-        (setq fixmee-cache-refresh-timer (run-with-timer secs secs 'fixmee-cache-invalidate))))))
+          (setq fixmee-cache-refresh-timer (run-with-timer secs secs 'fixmee-cache-invalidate)))))))
 
 (defun fixmee-cache-invalidate ()
   "Delete all cached data."
@@ -928,12 +934,16 @@ is 'toggle."
      (setq fixmee-mode nil))
    (fixmee-mode
     (fixmee-button-setup 1)
-    (fixmee-refresh-timer-setup)
+    (fixmee-refresh-timer-setup 1)
     (when (and (fixmee-called-interactively-p 'interactive)
                (not fixmee-less-feedback))
       (message "fixmee mode enabled")))
    (t
     (fixmee-button-setup -1)
+    (fixmee-refresh-timer-setup -1)
+    (when (eq (current-buffer)
+              (nth 1 fixmee-last-good-hit))
+      (setq fixmee-last-good-hit nil))
     (when (and (fixmee-called-interactively-p 'interactive)
                (not fixmee-less-feedback))
       (message "fixmee mode disabled")))))
@@ -958,9 +968,17 @@ If called with a negative ARG, deactivate fixmee-mode in the buffer."
             (fixmee-buffer-included-p (current-buffer)))
     (fixmee-mode arg)))
 
+(defun fixmee-mode-maybe-global-teardown ()
+  "Wipe global values when `global-fixmee-mode' is turned off."
+  (unless global-fixmee-mode
+    (setq fixmee-last-good-hit nil)
+    (fixmee-cache-invalidate)))
+
 (define-globalized-minor-mode global-fixmee-mode fixmee-mode fixmee-maybe-turn-on
   :keymap fixmee-mode-global-map
   :group 'fixmee)
+
+(add-hook 'global-fixmee-mode-hook 'fixmee-mode-maybe-global-teardown)
 
 ;;; interactive commands
 
