@@ -1249,6 +1249,7 @@ If called with a negative ARG, deactivate fixmee-mode in the buffer."
     (setq fixmee-last-good-hit nil)
     (fixmee-cache-invalidate)))
 
+;;;###autoload
 (define-globalized-minor-mode global-fixmee-mode fixmee-mode fixmee-maybe-turn-on
   :keymap fixmee-mode-global-map
   :group 'fixmee)
