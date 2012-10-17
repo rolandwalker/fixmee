@@ -122,9 +122,6 @@
 ;;
 ;; TODO
 ;;
-;;     Consider changing prefix arg to mean "constrain this command to
-;;     the current file".
-;;
 ;;     Better feedback messages for end-of-list and start-of-list.
 ;;
 ;;     Integrate with next-error (make a separate buffer showing hits) -
@@ -979,11 +976,12 @@ If called with a negative ARG, deactivate fixmee-mode in the buffer."
 If executed while the point is not within a \"fixme\" notice,
 navigate to the most urgent notice in all buffers.
 
-With universal prefix ARG, always navigate to the most urgent
-notice in the current buffer.
+With universal prefix ARG, constrain navigation to notices within
+the current buffer.
 
-With two universal prefix ARGs, always navigate to the most urgent
-notice in all buffers.
+With two universal prefix ARGs, always navigate to the most
+urgent notice in all buffers (ignoring whether the point is
+currently inside a notice).
 
 Only buffers in which `fixmee-mode' is active will be searched."
   (interactive "P")
@@ -996,6 +994,10 @@ Only buffers in which `fixmee-mode' is active will be searched."
     ((and (not (consp arg))
           (fixmee-inside-notice-p))
      (fixmee-navigate-to-hit (fixmee-find-nextmost-urgent (fixmee-inside-notice-p))))
+    ((and (equal arg '(4))
+          (fixmee-inside-notice-p))
+     (let ((fixmee-notice-list (fixmee-notices-from-current-buffer)))
+       (fixmee-navigate-to-hit (fixmee-find-nextmost-urgent (fixmee-inside-notice-p)))))
     ((equal arg '(4))
      (fixmee-navigate-to-hit (car (fixmee-notices-from-current-buffer))))
     (t
@@ -1007,11 +1009,12 @@ Only buffers in which `fixmee-mode' is active will be searched."
 If executed while the point is not within a \"fixme\" notice,
 navigate to the least urgent notice in all buffers.
 
-With universal prefix ARG, always navigate to the least urgent
-notice in the current buffer.
+With universal prefix ARG, constrain navigation to notices within
+the current buffer.
 
-With two universal prefix ARGs, always navigate to the most urgent
-notice in all buffers.
+With two universal prefix ARGs, always navigate to the least
+urgent notice in all buffers (ignoring whether the point is
+currently inside a notice).
 
 Only buffers in which `fixmee-mode' is active will be searched."
   (interactive "P")
@@ -1024,6 +1027,10 @@ Only buffers in which `fixmee-mode' is active will be searched."
     ((and (not (consp arg))
           (fixmee-inside-notice-p))
      (fixmee-navigate-to-hit (fixmee-find-prevmost-urgent (fixmee-inside-notice-p))))
+    ((and (equal arg '(4))
+          (fixmee-inside-notice-p))
+     (let ((fixmee-notice-list (fixmee-notices-from-current-buffer)))
+       (fixmee-navigate-to-hit (fixmee-find-prevmost-urgent (fixmee-inside-notice-p)))))
     ((equal arg '(4))
      (fixmee-navigate-to-hit (car (last (fixmee-notices-from-current-buffer)))))
     (t
