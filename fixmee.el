@@ -1627,7 +1627,8 @@ EVENT is the current mouse event."
 ;;
 ;; LocalWords: fixme fixmee ARGs FixmeeMode smartrep fsets Smartrep
 ;; LocalWords: incf callf CONSECUTIVES NOMSG caddr cadddr ppss Fixmee
-;; LocalWords: nextmost Prevmost Fixme prev smex fixm
+;; LocalWords: nextmost Prevmost Fixme prev smex fixm listview utils
+;; LocalWords: devel ARGth
 ;;
 
 ;;; fixmee.el ends here
