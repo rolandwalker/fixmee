@@ -501,7 +501,7 @@ Expressed as an element of `fixmee-notice-list'.")
   "Which mouse button invokes the modeline context menu.")
 
 (defvar fixmee-lighter-keymap-property 'keymap
-  "Which property sets the lighter keymap")
+  "Which property sets the lighter keymap.")
 
 ;;; keymaps
 
