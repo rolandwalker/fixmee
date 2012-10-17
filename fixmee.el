@@ -65,11 +65,11 @@
 ;;
 ;; The default key bindings are
 ;;
-;;     C-c f  `fixmee-goto-nextmost-urgent'
-;;     C-c F  `fixmee-goto-prevmost-urgent'
+;;     C-c f   `fixmee-goto-nextmost-urgent'
+;;     C-c F   `fixmee-goto-prevmost-urgent'
 ;;     C-c v   `fixmee-view-listing'
-;;     M-n    `fixmee-goto-next-by-position'      ; only when the point is
-;;     M-p    `fixmee-goto-previous-by-position'  ; inside a fixme notice
+;;     M-n     `fixmee-goto-next-by-position'      ; only when the point is
+;;     M-p     `fixmee-goto-previous-by-position'  ; inside a fixme notice
 ;;
 ;; When the smartrep package is installed, the "C-c" prefix need not
 ;; be used for consecutive fixmee-mode keyboard commands.  Instead,
@@ -218,13 +218,13 @@
 ;; for caddr, cadddr, incf, decf, callf, callf2, remove-if-not, position
 (require 'cl)
 
-(require 'nav-flash   nil t)
-(require 'back-button nil t)
-(require 'smartrep    nil t)
+(require 'nav-flash      nil t)
+(require 'back-button    nil t)
+(require 'smartrep       nil t)
 (require 'string-utils   nil t)
 
-(autoload 'button-lock-mode       "button-lock"  "Toggle button-lock-mode, a minor mode for making text clickable.")
-(autoload 'button-lock-set-button "button-lock"  "Attach mouse actions to text via `font-lock-mode'.")
+(autoload 'button-lock-mode       "button-lock"    "Toggle button-lock-mode, a minor mode for making text clickable.")
+(autoload 'button-lock-set-button "button-lock"    "Attach mouse actions to text via `font-lock-mode'.")
 (autoload 'tabulated-list-mode    "tabulated-list" "Generic major mode for browsing a list of items.")
 
 ;;; declarations
@@ -767,9 +767,9 @@ invalidating the cache when the regexp is changed."
     (cancel-timer fixmee-cache-refresh-timer)
     (setq fixmee-cache-refresh-timer nil))
   (unless (< arg 0)
-  (when fixmee-cache-refresh-interval
-    (let ((secs (truncate (* 60 fixmee-cache-refresh-interval))))
-      (when (> secs 0)
+    (when fixmee-cache-refresh-interval
+      (let ((secs (truncate (* 60 fixmee-cache-refresh-interval))))
+        (when (> secs 0)
           (setq fixmee-cache-refresh-timer (run-with-timer secs secs 'fixmee-cache-invalidate)))))))
 
 (defun fixmee-cache-invalidate ()
