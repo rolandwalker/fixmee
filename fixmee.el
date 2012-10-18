@@ -69,7 +69,7 @@
 ;;     C-c F   `fixmee-goto-prevmost-urgent'
 ;;     C-c v   `fixmee-view-listing'
 ;;     M-n     `fixmee-goto-next-by-position'      ; only when the point is
-;;     M-p     `fixmee-goto-previous-by-position'  ; inside a fixme notice
+;;     M-p     `fixmee-goto-previous-by-position'  ; inside a "fixme" notice
 ;;
 ;; To constrain the nextmost/prevmost-urgent commands to the current
 ;; buffer only, use a universal prefix argument, eg
@@ -110,10 +110,11 @@
 ;;
 ;;     GNU Emacs version 24.3-devel     : yes, at the time of writing
 ;;     GNU Emacs version 24.1 & 24.2    : yes
-;;     GNU Emacs version 23.3           : unknown
+;;     GNU Emacs version 23.3           : yes
 ;;     GNU Emacs version 22.3 and lower : no
 ;;
-;;     Requires: button-lock.el, tabulated-list.el
+;;     Requires: button-lock.el
+;;               tabulated-list.el (included with Emacs 24.x)
 ;;
 ;;     Uses if present: smartrep.el, nav-flash.el, back-button.el,
 ;;                      string-utils.el
@@ -310,7 +311,7 @@ a series of `fixmee-mode' navigation commands."
 
 (defface fixmee-notice-face
    '((t (:inherit font-lock-warning-face)))
-  "Face to show fixmee notices"
+  "Face to show \"fixme\" notices"
   :group 'fixmee)
 
 ;;;###autoload
@@ -565,13 +566,13 @@ Expressed as an element of `fixmee-notice-list'.")
 (defvar fixmee-lighter-keymap-property 'keymap
   "Which property sets the lighter keymap.")
 
-;; fixmee--listview-mode variables
+;; fixmee--listview variables
 
 (defvar fixmee--listview-mode nil "Mode variable for `fixmee--listview-mode'.")
 (make-variable-buffer-local 'fixmee--listview-mode)
 
 (defvar fixmee--listview-buffer-name "*fixmee notices*"
-  "The name of the buffer used to show a listview of all fixmee notices.")
+  "The name of the buffer used to show a listview of all \"fixme\" notices.")
 
 (defvar fixmee--listview-arrow-id nil
   "The `tabulated-list-mode' id associated with the overlay arrow.")
@@ -1150,12 +1151,12 @@ NOTICE-LIST is a list in the format of `fixmee-notice-list'."
       tablist)))
 
 (defun fixmee--listview-find-current-notice ()
-  "Get the id for the fixmee notice at the current line in `fixmee--listview-mode'."
+  "Get the id for the \"fixme\" notice at the current line in `fixmee--listview-mode'."
   (assert (eq major-mode 'fixmee--listview-mode)
           nil "Not in a fixmee--listview-mode buffer")
   (let ((id (tabulated-list-get-id)))
-    (assert id nil "No notice on this line")
-    (assert (buffer-live-p (car id)) nil "Buffer for this notice no longer active")
+    (assert id nil "No \"fixme\" notice on this line")
+    (assert (buffer-live-p (car id)) nil "Buffer for this \"fixme\" notice no longer active")
     id))
 
 (defun fixmee--listview-print-entry-function (id cols)
@@ -1444,7 +1445,7 @@ EVENT should be the mouse event which invoked the command."
 ;; listview next-error support
 
 (defun fixmee-listview-goto-notice ()
-  "Go to the fixmee notice on the current line."
+  "Go to the \"fixme\" notice on the current line."
   (interactive)
   (let ((buf (get-buffer fixmee--listview-buffer-name)))
     (assert buf nil "No current fixmee--listview-mode buffer.")
@@ -1502,7 +1503,7 @@ buffer."
 ;; listview interactive commands
 
 (defun fixmee-listview-view-notice ()
-  "View the fixmee notice on the current line.
+  "View the \"fixme\" notice on the current line.
 
 This command does not change the current window."
   (interactive)
@@ -1510,13 +1511,19 @@ This command does not change the current window."
 
 ;;;###autoload
 (defun fixmee-view-listing (&optional arg)
-  "View fixmee notices in a `fixmee--listview-mode' buffer.
+  "View \"fixme\" notices in a `fixmee--listview-mode' buffer.
 
 If the listview buffer currently exists, pop to it; otherwise
 create it.
 
-With universal prefix ARG, always reset the listview buffer to
-defaults and regenerate."
+The listview buffer represents a snapshot of the current state
+and does not update dynamically as you edit other
+buffers.  (Other fixmee navigation commands such as
+`fixmee-goto-nextmost-urgent' update and act according to
+your latest edits.)
+
+To regenerate the listview, issue this command with universal
+prefix ARG."
   (interactive "P")
   (let ((buf (get-buffer fixmee--listview-buffer-name)))
     (when (and (buffer-live-p buf)
@@ -1532,7 +1539,7 @@ defaults and regenerate."
     (fixmee--listview-revert-function)))
 
 (defun fixmee-listview-toggle-local-only ()
-  "Toggle whether to view notices only from a single buffer."
+  "Toggle whether to view \"fixme\" notices only from a single buffer."
   (interactive)
   (let ((buf (get-buffer fixmee--listview-buffer-name)))
     (assert buf nil "No current fixmee--listview-mode buffer.")
@@ -1602,7 +1609,7 @@ contiguous identical buffers separately."
   (fixmee-listview-next-buffer (- arg)))
 
 (defun fixmee-listview-mouse-goto-notice (event)
-  "Go to the fixmee notice on the current line using the mouse.
+  "Go to the \"fixme\" notice on the current line using the mouse.
 
 EVENT is the current mouse event."
   (interactive "e")
@@ -1610,7 +1617,9 @@ EVENT is the current mouse event."
   (fixmee-listview-goto-notice))
 
 (defun fixmee-listview-quit (&optional buf)
-  "Delete window associated with buffer BUF and kill BUF."
+  "Quit the buffer created by `fixmee-view-listing'.
+
+Delete window associated with buffer BUF and kill BUF."
   (interactive)
   (callf or buf (get-buffer fixmee--listview-buffer-name))
   (when (buffer-live-p buf)

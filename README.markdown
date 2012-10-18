@@ -97,9 +97,15 @@ Compatibility and Requirements
 
 	GNU Emacs version 24.3-devel     : yes, at the time of writing
 	GNU Emacs version 24.1 & 24.2    : yes
-	GNU Emacs version 23.3           : unknown
+	GNU Emacs version 23.3           : yes
 	GNU Emacs version 22.3 and lower : no
 
-Requires: [button-lock.el](http://github.com/rolandwalker/button-lock), tabulated-list.el
+Requires:  
+[button-lock.el](http://github.com/rolandwalker/button-lock),  
+[tabulated-list.el](http://raw.github.com/sigma/tabulated-list.el/master/tabulated-list.el) (included with Emacs 24.x)
 
-Uses if present: [smartrep.el](http://github.com/myuhe/smartrep.el), [nav-flash.el](http://github.com/rolandwalker/nav-flash), [back-button.el](http://github.com/rolandwalker/back-button), [string-utils.el](http://github.com/rolandwalker/string-utils)
+Uses if present:  
+[smartrep.el](http://github.com/myuhe/smartrep.el),  
+[nav-flash.el](http://github.com/rolandwalker/nav-flash),  
+[back-button.el](http://github.com/rolandwalker/back-button),  
+[string-utils.el](http://github.com/rolandwalker/string-utils)
