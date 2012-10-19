@@ -26,6 +26,7 @@ CURL=curl --silent
 EDITOR=runemacs -no_wait
 WORK_DIR=$(shell pwd)
 PACKAGE_NAME=$(shell basename $(WORK_DIR))
+PACKAGE_VERSION=$(shell perl -ne 'print "$$1\n" if m{^;+ *Version: *(\S+)}' $(PACKAGE_NAME).el)
 AUTOLOADS_FILE=$(PACKAGE_NAME)-autoloads.el
 TRAVIS_FILE=.travis.yml
 TEST_DIR=ert-tests
@@ -39,17 +40,27 @@ TEST_DEP_3=tabulated-list
 TEST_DEP_3_STABLE_URL=https://raw.github.com/sigma/tabulated-list.el/b547d9b728935102d1c418bc0e978c221c37f6ab/tabulated-list.el
 TEST_DEP_3_LATEST_URL=https://raw.github.com/sigma/tabulated-list.el/master/tabulated-list.el
 
-.PHONY : build downloads downloads-latest autoloads test-autoloads test-travis \
- test test-prep test-batch test-interactive test-tests clean edit run-pristine \
- run-pristine-local upload-github upload-wiki upload-marmalade test-dep-1      \
- test-dep-2 test-dep-3 test-dep-4 test-dep-5 test-dep-6 test-dep-7 test-dep-8  \
- test-dep-9
+.PHONY : build dist not-dirty pkg-version downloads downloads-latest autoloads \
+ test-autoloads test-travis test test-prep test-batch test-interactive         \
+ test-tests clean edit run-pristine run-pristine-local upload-github           \
+ upload-wiki upload-marmalade test-dep-1 test-dep-2 test-dep-3 test-dep-4      \
+ test-dep-5 test-dep-6 test-dep-7 test-dep-8 test-dep-9
 
 build :
 	$(RESOLVED_EMACS) $(EMACS_BATCH) --eval    \
 	    "(progn                                \
 	      (setq byte-compile-error-on-warn t)  \
 	      (batch-byte-compile))" *.el
+
+not-dirty :
+	@git diff --quiet '$(PACKAGE_NAME).el' 'plugins/$(PACKAGE_NAME)'*.el || \
+	 ( git --no-pager diff '$(PACKAGE_NAME).el';      \
+	   echo "Uncommitted edits - do a git stash";     \
+	   false )
+
+pkg-version :
+	@test -n '$(PACKAGE_VERSION)'    || \
+	 ( echo "No package version"; false )
 
 test-dep-1 :
 	@cd '$(TEST_DIR)'                                               && \
@@ -168,7 +179,7 @@ run-pristine-local :
 clean :
 	@rm -f '$(AUTOLOADS_FILE)' *.elc *~ */*.elc */*~ .DS_Store */.DS_Store *.bak */*.bak && \
 	cd '$(TEST_DIR)'                                                                     && \
-	rm -f './$(TEST_DEP_1).el' './$(TEST_DEP_2).el' './$(TEST_DEP_3).el' './$(TEST_DEP_4).el' './$(TEST_DEP_4a).el' \
+	rm -f './$(TEST_DEP_1).el' './$(TEST_DEP_2).el' './$(TEST_DEP_3).el' './$(TEST_DEP_4).el' './$(TEST_DEP_5a).el' \
 	      './$(TEST_DEP_5).el' './$(TEST_DEP_6).el' './$(TEST_DEP_7).el' './$(TEST_DEP_8).el' './$(TEST_DEP_9).el'
 
 edit :
@@ -177,11 +188,7 @@ edit :
 upload-github :
 	@git push origin master
 
-upload-wiki :
-	@git diff --quiet '$(PACKAGE_NAME).el'         || \
-	 ( git --no-pager diff '$(PACKAGE_NAME).el';      \
-	   echo "Outstanding edits - do a git stash";     \
-	   false )
+upload-wiki : not-dirty
 	@$(RESOLVED_EMACS) $(EMACS_BATCH) --eval          \
 	 "(progn                                          \
 	   (setq package-load-list '((yaoddmuse t)))      \
