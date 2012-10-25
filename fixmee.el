@@ -224,7 +224,7 @@
 ;;; Code:
 ;;
 
-;;; requires
+;;; requirements
 
 ;; for caddr, cadddr, incf, decf, callf, callf2, remove-if-not, position
 (require 'cl)
