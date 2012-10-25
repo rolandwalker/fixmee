@@ -31,9 +31,14 @@
 ;; Fixmee-mode tracks "fixme" notices in code comments, highlights
 ;; them, ranks them by urgency, and lets you navigate to them quickly.
 ;;
-;; Urgency of "fixme" notices is indicated by repeating the final
+;; A distinguishing feature of this library is that it tracks the
+;; urgency of each notice, allowing the user to jump directly to
+;; the most important problems.
+;;
+;; Urgency of "fixme" notices is indicated by repetitions of the final
 ;; character.  For example, one might write "FIXMEEEEEEEEE" for an
-;; important issue.
+;; important issue.  The `fixmee-goto-nextmost-urgent' command will
+;; navigate to the longest notice first.
 ;;
 ;; To use fixmee-mode, add the following to your ~/.emacs
 ;;
@@ -1642,7 +1647,7 @@ Delete window associated with buffer BUF and kill BUF."
 ;; LocalWords: fixme fixmee ARGs FixmeeMode smartrep fsets Smartrep
 ;; LocalWords: incf callf CONSECUTIVES NOMSG caddr cadddr ppss Fixmee
 ;; LocalWords: nextmost Prevmost Fixme prev smex fixm listview utils
-;; LocalWords: devel ARGth
+;; LocalWords: devel ARGth MULTI prevmost Multi Listview
 ;;
 
 ;;; fixmee.el ends here

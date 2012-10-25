@@ -20,14 +20,20 @@ Quickstart
 ;; M-x fixmee-view-listing RET
 ```
 
-fixmee-mode
+Explanation
 -----------
 
 Fixmee-mode tracks `fixme` notices in code comments, highlights them,
 ranks them by urgency, and lets you navigate to them quickly.
 
-Urgency of `fixme` notices is indicated by repeating the final character.
-For example, one might write `FIXMEEEEEEEEE` for an important issue.
+A distinguishing feature of this library is that it tracks the
+*urgency* of each notice, allowing the user to jump directly to
+the most important problems.
+
+Urgency of "fixme" notices is indicated by repetitions of the final
+character.  For example, one might write `FIXMEEEEEEEEE` for an
+important issue.  The `fixmee-goto-nextmost-urgent` command will
+navigate to the longest notice first.
 
 To use fixmee-mode, add the following to your ~/.emacs
 
@@ -71,7 +77,7 @@ buffer only, use a universal prefix argument, eg
 
 	C-u C-c f
 
-When the `smartrep` package is installed, the `C-c` prefix need not
+When the [smartrep](http://github.com/myuhe/smartrep.el) package is installed, the `C-c` prefix need not
 be used for consecutive fixmee-mode keyboard commands.  Instead, just
 keep pressing `f` (or whichever key you set in customize).
 
