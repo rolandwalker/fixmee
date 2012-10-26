@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/rolandwalker/fixmee.png)](http://travis-ci.org/rolandwalker/fixmee)
+[![Build Status](https://secure.travis-ci.org/rolandwalker/fixmee.png?branch=master)](http://travis-ci.org/rolandwalker/fixmee)
 
 Overview
 ========
