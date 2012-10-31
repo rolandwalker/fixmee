@@ -5,6 +5,8 @@ Overview
 
 Quickly navigate to FIXME notices in Emacs.
 
+![fixmee_context_menu](https://raw.github.com/rolandwalker/fixmee/master/fixmee_context_menu.png)
+
 Quickstart
 ----------
 
