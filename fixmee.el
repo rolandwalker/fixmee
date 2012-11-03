@@ -620,6 +620,9 @@ Expressed as an element of `fixmee-notice-list'.")
 (let ((smart-keys nil))
   (dolist (cmd fixmee-keyboard-navigation-commands)
     (dolist (k (symbol-value (intern (concat (symbol-name cmd) "-keystrokes"))))
+      (when (and (not (string-match-p "mouse\\|wheel\\|button" k))
+                 (not (get cmd :advertised-binding)))
+        (put cmd :advertised-binding (read-kbd-macro k)))
       (if (and (featurep 'smartrep)
                (stringp fixmee-smartrep-prefix)
                (> (length fixmee-smartrep-prefix) 0)
@@ -637,6 +640,9 @@ Expressed as an element of `fixmee-notice-list'.")
 
 (dolist (cmd fixmee-global-commands)
   (dolist (k (symbol-value (intern (concat (symbol-name cmd) "-keystrokes"))))
+      (when (and (not (string-match-p "mouse\\|wheel\\|button" k))
+                 (not (get cmd :advertised-binding)))
+        (put cmd :advertised-binding (read-kbd-macro k)))
     (define-key fixmee-mode-map        (read-kbd-macro k) cmd)
     (define-key fixmee-mode-global-map (read-kbd-macro k) cmd)))
 
@@ -675,10 +681,27 @@ Expressed as an element of `fixmee-notice-list'.")
                               (define-key menu-map [separator-2]                       '(menu-item "--"))
                               (define-key menu-map [fixmee-view-listing]               '(menu-item "View Listing of Notices" fixmee-view-listing))
                               (define-key menu-map [separator-1]                       '(menu-item "--"))
-                              (define-key menu-map [fixmee-goto-previous-by-position]  '(menu-item "Previous Fixme By Position" fixmee-goto-previous-by-position))
-                              (define-key menu-map [fixmee-goto-next-by-position]      '(menu-item "Next Fixme By Position" fixmee-goto-next-by-position))
-                              (define-key menu-map [fixmee-goto-prevmost-urgent]       '(menu-item "Previous Fixme By Urgency"  fixmee-goto-prevmost-urgent))
-                              (define-key menu-map [fixmee-goto-nextmost-urgent]       '(menu-item "Next Fixme By Urgency"  fixmee-goto-nextmost-urgent))
+                              (define-key menu-map [fixmee-goto-previous-by-position]  (append '(menu-item "Previous Fixme By Position" fixmee-goto-previous-by-position)
+                                                                                               ;; force :keys because of smartrep
+                                                                                               (when (get 'fixmee-goto-previous-by-position :advertised-binding)
+                                                                                                 (list :keys
+                                                                                                       (format-kbd-macro
+                                                                                                        (get 'fixmee-goto-previous-by-position :advertised-binding))))))
+                              (define-key menu-map [fixmee-goto-next-by-position]      (append '(menu-item "Next Fixme By Position" fixmee-goto-next-by-position)
+                                                                                               (when (get 'fixmee-goto-next-by-position :advertised-binding)
+                                                                                                 (list :keys
+                                                                                                        (format-kbd-macro
+                                                                                                         (get 'fixmee-goto-next-by-position :advertised-binding))))))
+                              (define-key menu-map [fixmee-goto-prevmost-urgent]       (append '(menu-item "Previous Fixme By Urgency"  fixmee-goto-prevmost-urgent)
+                                                                                               (when (get 'fixmee-goto-prevmost-urgent :advertised-binding)
+                                                                                                 (list :keys
+                                                                                                       (format-kbd-macro
+                                                                                                        (get 'fixmee-goto-prevmost-urgent :advertised-binding))))))
+                              (define-key menu-map [fixmee-goto-nextmost-urgent]       (append '(menu-item "Next Fixme By Urgency" fixmee-goto-nextmost-urgent)
+                                                                                               (when (get 'fixmee-goto-nextmost-urgent :advertised-binding)
+                                                                                                 (list :keys
+                                                                                                       (format-kbd-macro
+                                                                                                        (get 'fixmee-goto-nextmost-urgent :advertised-binding))))))
                               (define-key map (kbd "<mode-line> <wheel-up>"     )      'fixmee-goto-prevmost-urgent)
                               (define-key map (kbd "<mode-line> <wheel-down>"   )      'fixmee-goto-nextmost-urgent)
                               (define-key map (kbd "<mode-line> <M-wheel-up>"   )      'fixmee-goto-previous-by-position)
