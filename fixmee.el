@@ -272,7 +272,7 @@
   :group 'navigation
   :group 'convenience)
 
-(defcustom fixmee-notice-regexp "\\(@@@+\\|\\_<\\(?:[Tt][Oo][Dd][Oo]+\\|[Ff][Ii][Xx][Mm][Ee]+\\|XXX+\\)\\_>\\)"
+(defcustom fixmee-notice-regexp "\\(@@@+\\|\\_<\\(?:[Tt][Oo][Dd][Oo]+\\|[Ff][Ii][Xx][Mm][Ee]+\\|XXX+\\)\\)\\(?:[/:?!. \t\r\n\f\v]+\\|-+\\(?:\\s-\\|[\r\n\f\v]\\)\\|\\_>\\)"
   "Pattern for matching \"fixme\" notices.
 
 There must be one parenthesized grouping which captures the
@@ -914,7 +914,8 @@ characters of STR-VAL are always ignored."
                           (let ((raw-match (match-string-no-properties 1)))
                             (when (and (>= (length raw-match) 3)
                                        (or (not comment-start)                         ; mode has no comment syntax
-                                           (save-match-data (nth 4 (syntax-ppss)))))   ; point is within a comment
+                                           (save-match-data
+                                             (nth 4 (syntax-ppss (match-beginning 1)))))) ; point is within a comment
                               (push (list
                                      (fixmee-measure-urgency raw-match)
                                      (current-buffer)
