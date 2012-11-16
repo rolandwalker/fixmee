@@ -866,11 +866,8 @@ invalidating the cache when the regexp is changed."
          #'(lambda (a b) (string< (buffer-name a) (buffer-name b))))
         fixmee-pristine-buffer-list))
 
-(defun fixmee-this-buffer-not-pristine-hook (&optional beg end len)
-  "Add BUFFER to the list modified since the last search for \"fixme\" notices.
-
-Arguments BEG, END, and LEN are as passed to an `after-change-functions'
-hook, and are ignored."
+(defun fixmee-this-buffer-not-pristine-hook (&rest _ignored)
+  "Add BUFFER to the list modified since the last search for \"fixme\" notices."
   (remove-hook 'after-change-functions 'fixmee-this-buffer-not-pristine-hook t)
   (setq fixmee-last-locate-state nil)
   (callf2 delq (current-buffer) fixmee-pristine-buffer-list))
@@ -1244,7 +1241,7 @@ ID and COLS are as documented at `tabulated-list-print-entry'."
       (when (equal fixmee--listview-arrow-id (tabulated-list-get-id))
         (setq overlay-arrow-position (copy-marker (line-beginning-position)))))))
 
-(defun fixmee--listview-revert-function (&optional _ignore1 _ignore2)
+(defun fixmee--listview-revert-function (&rest _ignored)
   "Handle revert in `fixmee--listview-mode' buffers."
   (when (eq major-mode 'fixmee--listview-mode)
     (fixmee-locate-all-notices)
