@@ -18,7 +18,7 @@
 
 ;;; todo - fixmee-cache-invalidate ()
 
-;;; todo - fixmee-get-buffer-state () ;; optimization
+;;; todo - fixmee-get-buffer-state ()
 
 ;;; todo - fixmee-this-buffer-not-pristine-hook (&optional beg end len)
 
@@ -28,7 +28,7 @@
 
 ;;; todo - fixmee-sort-notice-list ()
 
-;;; todo - fixmee-notices-from-pristine-buffers () ;; optimization
+;;; todo - fixmee-notices-from-pristine-buffers ()
 
 ;;; todo - fixmee-notices-from-current-buffer ()
 
