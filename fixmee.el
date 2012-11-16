@@ -126,6 +126,15 @@
 ;;
 ;; Bugs
 ;;
+;;     fixmee--listview-mode-map (the major-mode menu) does not work
+;;     well as a context menu.
+;;         - menu from major mode of selected window appears even when
+;;           right-clicking in this window
+;;         - mouse-event wrappers keep keyboard shortcuts from appearing
+;;           in menu-bar
+;;         - better to have a separate context menu attached to the
+;;           entries, using a keymap text property
+;;
 ;;     When comment-start is defined, only the first notice on a line
 ;;     is lit up by button-lock, though fixmee-mode is aware of multiple
 ;;     notices on a line.  This is worked around for the moment by
@@ -647,7 +656,8 @@ Expressed as an element of `fixmee-notice-list'.")
     (define-key fixmee-mode-global-map (read-kbd-macro k) cmd)))
 
 (defvar fixmee--listview-mode-map
-  (let ((map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap))
+        (menu-map (make-sparse-keymap "Fixmee Listview")))
     (define-key map (kbd "<mouse-2>") 'fixmee-listview-mouse-goto-notice)
     (define-key map (kbd "C-c C-c"  ) 'fixmee-listview-goto-notice)
     (define-key map (kbd "<return>" ) 'fixmee-listview-goto-notice)
@@ -667,6 +677,40 @@ Expressed as an element of `fixmee-notice-list'.")
     (define-key map (kbd "}"        ) 'fixmee-listview-next-buffer)
     (define-key map (kbd "M-{"      ) 'fixmee-listview-previous-buffer)
     (define-key map (kbd "M-}"      ) 'fixmee-listview-next-buffer)
+    (define-key menu-map [customize]          '(menu-item "Customize"      (lambda (e) (interactive "e") (customize-group 'fixmee))))
+    (define-key menu-map [quit-listview]      '(menu-item "Quit Listview"  fixmee-listview-quit))
+    (define-key menu-map [separator-1]        '(menu-item "--"))
+    (define-key menu-map [follow-mode]        '(menu-item "Follow Mode"        next-error-follow-minor-mode
+                                                          :button (:toggle .   next-error-follow-minor-mode)))
+    (define-key menu-map [toggle-local-only]  '(menu-item "Local Notices Only" fixmee-listview-toggle-local-only
+                                                          :button (:toggle .   fixmee--listview-local-only)))
+    (define-key menu-map [separator-2]        '(menu-item "--"))
+    (define-key menu-map [previous-buffer]    '(menu-item "Previous Buffer"  (lambda (e)
+                                                                               (interactive "e")
+                                                                               (ignore-errors (posn-set-point (event-end last-nonmenu-event)))
+                                                                               (fixmee-listview-previous-buffer))))
+    (define-key menu-map [next-buffer]        '(menu-item "Next Buffer"      (lambda (e)
+                                                                               (interactive "e")
+                                                                               (ignore-errors (posn-set-point (event-end last-nonmenu-event)))
+                                                                               (fixmee-listview-next-buffer))))
+    (define-key menu-map [previous-notice]    '(menu-item "Previous Notice"  (lambda (e)
+                                                                               (interactive "e")
+                                                                               (ignore-errors (posn-set-point (event-end last-nonmenu-event)))
+                                                                               (previous-error-no-select))))
+    (define-key menu-map [next-notice]        '(menu-item "Next Notice"      (lambda (e)
+                                                                               (interactive "e")
+                                                                               (ignore-errors (posn-set-point (event-end last-nonmenu-event)))
+                                                                               (next-error-no-select))))
+    (define-key menu-map [separator-3]        '(menu-item "--"))
+    (define-key menu-map [goto-notice]        '(menu-item "Goto Notice"      (lambda (e)
+                                                                               (interactive "e")
+                                                                               (ignore-errors (posn-set-point (event-end last-nonmenu-event)))
+                                                                               (fixmee-listview-goto-notice))))
+    (define-key menu-map [view-notice]        '(menu-item "View Notice"      (lambda (e)
+                                                                               (interactive "e")
+                                                                               (ignore-errors (posn-set-point (event-end last-nonmenu-event)))
+                                                                               (fixmee-listview-view-notice))))
+    (define-key map [menu-bar fixmee-listview] (cons "Fixmee Listview" menu-map))
     map)
   "Keymap for `fixmee--listview-mode' buffers.")
 (put 'fixmee-listview-goto-notice :advertised-binding (kbd "<return>"))
