@@ -112,6 +112,29 @@
 
 ;;; todo - fixmee-listview-quit (&optional buf)
 
+
+;;; fixmee-mode
+
+(ert-deftest fixmee-mode-01 nil
+  :tags '(:interactive)
+  (with-temp-buffer
+    (rename-buffer "fixmee-mode-test-01" t)
+    (emacs-lisp-mode)
+    (fixmee-mode 1)
+    (should fixmee-mode)
+    (fixmee-mode -1)
+    (should-not fixmee-mode)))
+
+
+;;; global-fixmee-mode
+
+(ert-deftest global-fixmee-mode-01 nil
+  (global-fixmee-mode 1)
+  (should global-fixmee-mode)
+  (global-fixmee-mode -1)
+  (should-not global-fixmee-mode))
+
+
 ;;
 ;; Emacs
 ;;
