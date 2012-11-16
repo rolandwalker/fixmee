@@ -800,7 +800,8 @@ invalidating the cache when the regexp is changed."
   (when (timerp fixmee-cache-refresh-timer)
     (cancel-timer fixmee-cache-refresh-timer)
     (setq fixmee-cache-refresh-timer nil))
-  (unless (< arg 0)
+  (unless (and (numberp arg)
+               (< arg 0))
     (when fixmee-cache-refresh-interval
       (let ((secs (truncate (* 60 fixmee-cache-refresh-interval))))
         (when (> secs 0)
@@ -1506,6 +1507,7 @@ ARG defaults to 1.
 When RESET is non-nil, move to the first match in the error
 buffer."
   (interactive "p")
+  (callf or arg 1)
   (with-current-buffer
       (if (next-error-buffer-p (current-buffer))
           (current-buffer)
@@ -1581,6 +1583,7 @@ prefix ARG."
 
 ARG defaults to 1."
   (interactive "p")
+  (callf or arg 1)
   (fixmee--listview-next-error-function (- arg)))
 
 (defun fixmee-listview-next-buffer (&optional arg)
@@ -1591,6 +1594,7 @@ ARG defaults to 1.
 If the listview is not sorted per-buffer, considers each block of
 contiguous identical buffers separately."
   (interactive "p")
+  (callf or arg 1)
   (with-current-buffer
       (if (next-error-buffer-p (current-buffer))
           (current-buffer)
@@ -1635,6 +1639,7 @@ ARG defaults to 1.
 If the listview is not sorted per-buffer, considers each block of
 contiguous identical buffers separately."
   (interactive "p")
+  (callf or arg 1)
   (fixmee-listview-next-buffer (- arg)))
 
 (defun fixmee-listview-mouse-goto-notice (event)
