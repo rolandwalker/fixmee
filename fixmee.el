@@ -161,8 +161,6 @@
 ;;     There is no need for fixmee--listview-mode to be an interactive
 ;;     command.
 ;;
-;;     Context menu on lighter for listview mode.
-;;
 ;;     Consider allowing all navigation commands to update the listview
 ;;     buffer (currently only next-error commands do so)
 ;;
