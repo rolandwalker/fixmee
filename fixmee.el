@@ -275,7 +275,7 @@
   "Navigate to \"fixme\" notices in code."
   :version "0.8.2"
   :link '(emacs-commentary-link :tag "Commentary" "fixmee")
-  :link '(url-link :tag "Github" "http://github.com/rolandwalker/fixmee")
+  :link '(url-link :tag "GitHub" "http://github.com/rolandwalker/fixmee")
   :link '(url-link :tag "EmacsWiki" "http://emacswiki.org/emacs/FixmeeMode")
   :prefix "fixmee-"
   :group 'navigation
