@@ -3,3 +3,4 @@
 /ert-tests/tabulated-list.el
 *-autoloads.el
 *.elc
+*~
