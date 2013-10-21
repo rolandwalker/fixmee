@@ -299,9 +299,8 @@ that defines comments in its syntax table."
 Set to nil or the empty string to disable the mode-line
 lighter for `fixmee-mode'."
   :type 'string
-  (when (>= emacs-major-version 23) :risky)
-  (when (>= emacs-major-version 23) t)
   :group 'fixmee)
+(put 'fixmee-mode-lighter 'risky-local-variable t)
 
 (defcustom fixmee-less-feedback nil
   "Give less echo area feedback."
