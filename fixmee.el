@@ -116,7 +116,8 @@
 ;;     GNU Emacs version 24.4-devel     : yes, at the time of writing
 ;;     GNU Emacs version 24.3           : yes
 ;;     GNU Emacs version 23.3           : yes
-;;     GNU Emacs version 22.3 and lower : no
+;;     GNU Emacs version 22.2           : yes, with some limitations
+;;     GNU Emacs version 21.x and lower : unknown
 ;;
 ;;     Requires: button-lock.el
 ;;               tabulated-list.el (included with Emacs 24.x)
@@ -267,6 +268,21 @@
   (defvar tabulated-list-entries)
   (defvar tabulated-list-printer)
   (defvar button-lock-mode))
+
+(unless (boundp 'special-mode-map)
+  ;; backwards compat, needed for tabulated-list in Emacs 22
+  (defvar special-mode-map
+    (let ((map (make-sparse-keymap)))
+      (suppress-keymap map)
+      (define-key map "q" 'quit-window)
+      (define-key map " " 'scroll-up-command)
+      (define-key map "\C-?" 'scroll-down-command)
+      (define-key map "?" 'describe-mode)
+      (define-key map "h" 'describe-mode)
+      (define-key map ">" 'end-of-buffer)
+      (define-key map "<" 'beginning-of-buffer)
+      (define-key map "g" 'revert-buffer)
+      map)))
 
 ;;; customizable variables
 

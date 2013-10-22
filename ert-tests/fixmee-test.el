@@ -8,9 +8,9 @@
   (when (fboundp 'package-initialize)
     (package-initialize)))
 
+(require 'fixmee)
 (require 'button-lock)
 (require 'tabulated-list)
-(require 'fixmee)
 
 ;;; this is a stub - no tests defined
 
