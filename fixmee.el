@@ -5,8 +5,8 @@
 ;; Author: Roland Walker <walker@pobox.com>
 ;; Homepage: http://github.com/rolandwalker/fixmee
 ;; URL: http://raw.github.com/rolandwalker/fixmee/master/fixmee.el
-;; Version: 0.8.2
-;; Last-Updated: 16 Nov 2012
+;; Version: 0.8.4
+;; Last-Updated: 30 Oct 2013
 ;; EmacsWiki: FixmeeMode
 ;; Keywords: navigation, convenience
 ;; Package-Requires: ((button-lock "1.0.0") (nav-flash "1.0.0") (back-button "0.6.0") (smartrep "0.0.3") (string-utils "0.3.2") (tabulated-list "0"))
@@ -289,7 +289,7 @@
 ;;;###autoload
 (defgroup fixmee nil
   "Navigate to \"fixme\" notices in code."
-  :version "0.8.2"
+  :version "0.8.4"
   :link '(emacs-commentary-link :tag "Commentary" "fixmee")
   :link '(url-link :tag "GitHub" "http://github.com/rolandwalker/fixmee")
   :link '(url-link :tag "EmacsWiki" "http://emacswiki.org/emacs/FixmeeMode")
