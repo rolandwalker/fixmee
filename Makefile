@@ -22,7 +22,7 @@ EMACS_BATCH=$(EMACS_CLEAN) --batch
 TESTS=
 WIKI_USERNAME=roland.walker
 
-CURL=curl --silent
+CURL=curl --location --silent
 EDITOR=runemacs -no_wait
 WORK_DIR=$(shell pwd)
 PACKAGE_NAME=$(shell basename $(WORK_DIR))
@@ -34,11 +34,11 @@ TEST_DEP_1=ert
 TEST_DEP_1_STABLE_URL=http://git.savannah.gnu.org/cgit/emacs.git/plain/lisp/emacs-lisp/ert.el?h=emacs-24.3
 TEST_DEP_1_LATEST_URL=http://git.savannah.gnu.org/cgit/emacs.git/plain/lisp/emacs-lisp/ert.el?h=master
 TEST_DEP_2=button-lock
-TEST_DEP_2_STABLE_URL=https://raw.github.com/rolandwalker/button-lock/88132c60f0fdb0ca89dcd77f20344728f322a488/button-lock.el
-TEST_DEP_2_LATEST_URL=https://raw.github.com/rolandwalker/button-lock/master/button-lock.el
+TEST_DEP_2_STABLE_URL=https://raw.githubusercontent.com/rolandwalker/button-lock/88132c60f0fdb0ca89dcd77f20344728f322a488/button-lock.el
+TEST_DEP_2_LATEST_URL=https://raw.githubusercontent.com/rolandwalker/button-lock/master/button-lock.el
 TEST_DEP_3=tabulated-list
-TEST_DEP_3_STABLE_URL=https://raw.github.com/sigma/tabulated-list.el/b547d9b728935102d1c418bc0e978c221c37f6ab/tabulated-list.el
-TEST_DEP_3_LATEST_URL=https://raw.github.com/sigma/tabulated-list.el/master/tabulated-list.el
+TEST_DEP_3_STABLE_URL=https://raw.githubusercontent.com/sigma/tabulated-list.el/b547d9b728935102d1c418bc0e978c221c37f6ab/tabulated-list.el
+TEST_DEP_3_LATEST_URL=https://raw.githubusercontent.com/sigma/tabulated-list.el/master/tabulated-list.el
 
 .PHONY : build dist not-dirty pkg-version downloads downloads-latest autoloads \
  test-autoloads test-travis test test-prep test-batch test-interactive         \

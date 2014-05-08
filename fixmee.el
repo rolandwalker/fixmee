@@ -4,7 +4,7 @@
 ;;
 ;; Author: Roland Walker <walker@pobox.com>
 ;; Homepage: http://github.com/rolandwalker/fixmee
-;; URL: http://raw.github.com/rolandwalker/fixmee/master/fixmee.el
+;; URL: http://raw.githubusercontent.com/rolandwalker/fixmee/master/fixmee.el
 ;; Version: 0.8.4
 ;; Last-Updated: 30 Oct 2013
 ;; EmacsWiki: FixmeeMode
