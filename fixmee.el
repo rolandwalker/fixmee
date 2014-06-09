@@ -1291,6 +1291,7 @@ ID and COLS are as documented at `tabulated-list-print-entry'."
 
 ;;; minor mode definition
 
+;;;###autoload
 (define-minor-mode fixmee-mode
   "Turn on `fixmee-mode'.
 
