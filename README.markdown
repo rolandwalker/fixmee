@@ -10,7 +10,7 @@ Quickly navigate to FIXME notices in Emacs.
 Quickstart
 ----------
 
-```lisp
+```elisp
 (require 'fixmee)
  
 (global-fixmee-mode 1)
@@ -39,7 +39,7 @@ navigate to the longest notice first.
 
 To use fixmee-mode, add the following to your ~/.emacs
 
-```lisp
+```elisp
 (require 'fixmee)
 (global-fixmee-mode 1)
 ```
