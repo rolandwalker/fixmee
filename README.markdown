@@ -46,11 +46,11 @@ comment
 
 or press
 
-	C-c f
+<kbd>C-c</kbd> <kbd>f</kbd>
 
 or
 
-	M-x fixmee RET
+<kbd>M-x</kbd> <kbd>fixmee</kbd> <kbd>RET</kbd>
 
 or
 
@@ -64,27 +64,33 @@ or
 
 The default key bindings are
 
-	C-c f  fixmee-goto-nextmost-urgent
-	C-c F  fixmee-goto-prevmost-urgent
-	C-c v  fixmee-view-listing
-	M-n    fixmee-goto-next-by-position      ; only when the point is
-	M-p    fixmee-goto-previous-by-position  ; inside a fixme notice
+Keystrokes                   | Function
+-----------------------------|--------------------------------
+<kbd>C-c</kbd> <kbd>f</kbd>  | `fixmee-goto-nextmost-urgent`
+<kbd>C-c</kbd> <kbd>F</kbd>  | `fixmee-goto-prevmost-urgent`
+<kbd>C-c</kbd> <kbd>v</kbd>  | `fixmee-view-listing`
+<kbd>M-n</kbd>               | `fixmee-goto-next-by-position`      ; only when the point is
+<kbd>M-p</kbd>               | `fixmee-goto-previous-by-position`  ; inside a fixme notice
 
 To constrain the nextmost/prevmost-urgent commands to the current
 buffer only, use a universal prefix argument, eg
 
-	C-u C-c f
+<kbd>C-u</kbd> <kbd>C-c</kbd> <kbd>f</kbd>
 
-When the [smartrep](http://github.com/myuhe/smartrep.el) package is installed, the `C-c` prefix need not
+When the [smartrep](http://github.com/myuhe/smartrep.el) package is installed, the <kbd>C-c</kbd> prefix need not
 be used for consecutive fixmee-mode keyboard commands.  Instead, just
-keep pressing `f` (or whichever key you set in customize).
+keep pressing <kbd>f</kbd> (or whichever key you set in customize).
 
 There is also a context menu and mouse-wheel bindings on the
 minor-mode lighter in the modeline:
 
-	        mouse-1  context menu
-	  wheel-down/up  next/prev by urgency
-	M-wheel-down/up  next/prev by position
+Mouse action            | Effect
+------------------------|-----------------------
+<kbd>mouse-1</kbd>      | context menu
+<kbd>wheel-down</kbd>   | next by urgency
+<kbd>wheel-up</kbd>     | previous by urgency
+<kbd>M-wheel-down</kbd> | next by position
+<kbd>M-wheel-up</kbd>   | previous by position
 
 ## Patterns
 
