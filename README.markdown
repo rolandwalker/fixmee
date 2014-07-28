@@ -1,14 +1,12 @@
 [![Build Status](https://secure.travis-ci.org/rolandwalker/fixmee.png?branch=master)](http://travis-ci.org/rolandwalker/fixmee)
 
-Overview
-========
+# Overview
 
 Quickly navigate to FIXME notices in Emacs.
 
 ![fixmee_context_menu](https://raw.githubusercontent.com/rolandwalker/fixmee/master/fixmee_context_menu.png)
 
-Quickstart
-----------
+## Quickstart
 
 ```elisp
 (require 'fixmee)
@@ -22,8 +20,7 @@ Quickstart
 ;; M-x fixmee-view-listing RET
 ```
 
-Explanation
------------
+## Explanation
 
 Fixmee-mode tracks `fixme` notices in code comments, highlights them,
 ranks them by urgency, and lets you navigate to them quickly.
@@ -63,8 +60,7 @@ or
 
 	execute `fixmee-view-listing` to navigate using `next-error` conventions.
 
-Key Bindings
-------------
+## Key Bindings
 
 The default key bindings are
 
@@ -90,8 +86,7 @@ minor-mode lighter in the modeline:
 	  wheel-down/up  next/prev by urgency
 	M-wheel-down/up  next/prev by position
 
-Patterns
---------
+## Patterns
 
 The following fixme patterns are supported by default:
 
@@ -100,8 +95,7 @@ The following fixme patterns are supported by default:
 	todo
 	fixme
 
-Compatibility and Requirements
-------------------------------
+## Compatibility and Requirements
 
 	GNU Emacs version 24.4-devel     : yes, at the time of writing
 	GNU Emacs version 24.3           : yes
