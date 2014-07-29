@@ -113,8 +113,4 @@ Requires:
 [button-lock.el](http://github.com/rolandwalker/button-lock),  
 [tabulated-list.el](http://raw.githubusercontent.com/sigma/tabulated-list.el/master/tabulated-list.el) (included with Emacs 24.x)
 
-Uses if present:  
-[smartrep.el](http://github.com/myuhe/smartrep.el),  
-[nav-flash.el](http://github.com/rolandwalker/nav-flash),  
-[back-button.el](http://github.com/rolandwalker/back-button),  
-[string-utils.el](http://github.com/rolandwalker/string-utils)
+Uses if present: [nav-flash.el](http://github.com/rolandwalker/nav-flash), [back-button.el](http://github.com/rolandwalker/back-button), [string-utils.el](http://github.com/rolandwalker/string-utils), [smartrep.el](http://github.com/myuhe/smartrep.el)
