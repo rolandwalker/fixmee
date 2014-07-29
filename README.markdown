@@ -34,7 +34,7 @@ character.  For example, one might write `FIXMEEEEEEEEE` for an
 important issue.  The `fixmee-goto-nextmost-urgent` command will
 navigate to the longest notice first.
 
-To use fixmee-mode, add the following to your ~/.emacs
+To use fixmee-mode, add the following to your `~/.emacs` file
 
 ```elisp
 (require 'fixmee)
