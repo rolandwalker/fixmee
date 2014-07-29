@@ -79,7 +79,7 @@ buffer only, use a universal prefix argument, eg
 
 When the [smartrep](http://github.com/myuhe/smartrep.el) package is installed, the <kbd>C-c</kbd> prefix need not
 be used for consecutive fixmee-mode keyboard commands.  Instead, just
-keep pressing <kbd>f</kbd> (or whichever key you set in customize).
+keep pressing <kbd>f</kbd> (or whichever key you set in `customize`).
 
 There is also a context menu and mouse-wheel bindings on the
 minor-mode lighter in the modeline:
