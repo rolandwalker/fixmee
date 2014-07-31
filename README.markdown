@@ -6,6 +6,12 @@ Quickly navigate to FIXME notices in Emacs.
 
 ![fixmee_context_menu](https://raw.githubusercontent.com/rolandwalker/fixmee/master/fixmee_context_menu.png)
 
+ * [Quickstart](#quickstart)
+ * [Explanation](#explanation)
+ * [Key Bindings](#key-bindings)
+ * [Patterns](#patterns)
+ * [Compatibility and Requirements](#compatibility-and-requirements)
+
 ## Quickstart
 
 ```elisp
