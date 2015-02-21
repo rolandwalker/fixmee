@@ -336,6 +336,20 @@ a series of `fixmee-mode' navigation commands."
   :type 'boolean
   :group 'fixmee)
 
+(defcustom fixmee-rear-nonsticky t
+  "Whether to set the 'rear-nonsticky property on fixmee buttons.
+
+This value may be unset to stop `fixmee-mode' from attempting
+to manage the 'rear-nonsticky text property, which may improve
+compatibility with other modes that depend on setting the same
+property (Example: ielm).
+
+The default, t, is better for most users, because it keeps the
+properties of the button from spuriously attaching to other
+text."
+  :type 'boolean
+  :group 'fixmee)
+
 (defface fixmee-notice-face
    '((t (:inherit font-lock-warning-face)))
   "Face to show \"fixme\" notices"
@@ -1150,6 +1164,7 @@ If called with negative ARG, remove the buttons."
                                                    :keyboard-action 'fixmee-goto-nextmost-urgent
                                                    :face            'fixmee-notice-face :face-policy 'prepend
                                                    :mouse-face      'fixmee-notice-face
+                                                   :rear-sticky     fixmee-rear-nonsticky
                                                    :grouping        1))
       (dolist (key fixmee-within-notice-goto-next-by-position-keystrokes)
         (button-lock-extend-binding fixmee-button 'fixmee-goto-next-by-position nil key))
