@@ -351,14 +351,21 @@ a series of `fixmee-mode' navigation commands."
                                   Buffer-menu-mode
                                   bm-show-mode
                                   dired-mode
-                                  eshell-mode
+                                  wdired-mode
                                   gnus-article-mode
                                   mime/viewer-mode
                                   rmail-mode
                                   term-mode
+                                  comint-mode
+                                  shell-mode
+                                  eshell-mode
+                                  inferior-emacs-lisp-mode
                                   fixmee--listview-mode
                                   )
-  "Fixmee will not scan a buffer if its major mode is included in this list."
+  "Fixmee will not scan a buffer if its major mode is included in this list.
+
+A buffer will also be excluded if its major mode is derived from a mode in
+this list."
   :type '(repeat symbol)
   :group 'fixmee-global)
 
