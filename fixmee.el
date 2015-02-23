@@ -1,6 +1,6 @@
 ;;; fixmee.el --- Quickly navigate to FIXME notices in code
 ;;
-;; Copyright (c) 2012-13 Roland Walker
+;; Copyright (c) 2012-15 Roland Walker
 ;;
 ;; Author: Roland Walker <walker@pobox.com>
 ;; Homepage: http://github.com/rolandwalker/fixmee
