@@ -251,6 +251,7 @@
 (declare-function back-button-push-mark-local-and-global  "back-button.el")
 (declare-function button-lock-unset-button                "button-lock.el")
 (declare-function button-lock-extend-binding              "button-lock.el")
+(declare-function button-lock-parent-modes                "button-lock.el")
 (declare-function string-utils-squeeze-filename           "string-utils.el")
 (declare-function string-utils-trim-whitespace            "string-utils.el")
 (declare-function tabulated-list-get-id                   "tabulated-list.el")
