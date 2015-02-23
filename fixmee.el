@@ -928,7 +928,7 @@ invalidating the cache when the regexp is changed."
       (when (and (not (minibufferp buf))
                  (not (eq (aref (buffer-name) 0) ?\s))           ; overlaps with exclude-pattern
                  (not (memq major-mode fixmee-exclude-modes))
-                 (not (intersection (button-lock--parent-modes) fixmee-exclude-modes))
+                 (not (intersection (button-lock-parent-modes) fixmee-exclude-modes))
                  (not (string-match-p fixmee-buffer-name-exclude-pattern (buffer-name buf)))
                  (or (not (numberp fixmee-buffer-maximum-size))
                      (= 0 fixmee-buffer-maximum-size)
