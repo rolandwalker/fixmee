@@ -9,7 +9,7 @@
 ;; Last-Updated: 30 Oct 2013
 ;; EmacsWiki: FixmeeMode
 ;; Keywords: navigation, convenience
-;; Package-Requires: ((button-lock "1.0.0") (nav-flash "1.0.0") (back-button "0.6.0") (smartrep "0.0.3") (string-utils "0.3.2") (tabulated-list "0"))
+;; Package-Requires: ((button-lock "1.0.2") (nav-flash "1.0.0") (back-button "0.6.0") (smartrep "0.0.3") (string-utils "0.3.2") (tabulated-list "0"))
 ;;
 ;; Simplified BSD License
 ;;
@@ -231,7 +231,7 @@
 
 ;;; requirements
 
-;; for caddr, cadddr, incf, decf, callf, callf2, remove-if-not, position
+;; for caddr, cadddr, incf, decf, callf, callf2, remove-if-not, position, intersection
 (require 'cl)
 
 (require 'nav-flash      nil t)
@@ -351,14 +351,21 @@ a series of `fixmee-mode' navigation commands."
                                   Buffer-menu-mode
                                   bm-show-mode
                                   dired-mode
-                                  eshell-mode
+                                  wdired-mode
                                   gnus-article-mode
                                   mime/viewer-mode
                                   rmail-mode
                                   term-mode
+                                  comint-mode
+                                  shell-mode
+                                  eshell-mode
+                                  inferior-emacs-lisp-mode
                                   fixmee--listview-mode
                                   )
-  "Fixmee will not scan a buffer if its major mode is included in this list."
+  "Fixmee will not scan a buffer if its major mode is included in this list.
+
+A buffer will also be excluded if its major mode is derived from a mode in
+this list."
   :type '(repeat symbol)
   :group 'fixmee-global)
 
@@ -907,6 +914,7 @@ invalidating the cache when the regexp is changed."
       (when (and (not (minibufferp buf))
                  (not (eq (aref (buffer-name) 0) ?\s))           ; overlaps with exclude-pattern
                  (not (memq major-mode fixmee-exclude-modes))
+                 (not (intersection (button-lock--parent-modes) fixmee-exclude-modes))
                  (not (string-match-p fixmee-buffer-name-exclude-pattern (buffer-name buf)))
                  (or (not (numberp fixmee-buffer-maximum-size))
                      (= 0 fixmee-buffer-maximum-size)
