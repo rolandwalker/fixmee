@@ -16,7 +16,8 @@ Quickly navigate to FIXME notices in Emacs.
 
 ```elisp
 (require 'fixmee)
- 
+(require 'button-lock)
+
 (global-fixmee-mode 1)
  
 ;; right-click on the word "fixme" in a comment
@@ -44,6 +45,7 @@ To use fixmee-mode, add the following to your `~/.emacs` file
 
 ```elisp
 (require 'fixmee)
+(require 'button-lock)
 (global-fixmee-mode 1)
 ```
 
