@@ -362,6 +362,17 @@ text."
   "Face to show \"fixme\" notices"
   :group 'fixmee)
 
+(defcustom fixmee-measure-urgency-function 'fixmee-measure-urgency
+  "Function used to calculate urgency ranking.
+
+Function should accept a single string value, the match
+value from `fixmee-notice-regexp', and return an
+integer value.
+
+The function must not change the match data."
+   :type 'function
+   :group 'fixmee)
+
 ;;;###autoload
 (defgroup fixmee-global nil
   "Settings for `global-fixmee-mode'."
@@ -1014,7 +1025,7 @@ characters of STR-VAL are always ignored."
                                            (save-match-data
                                              (nth 4 (syntax-ppss (match-beginning 1)))))) ; point is within a comment
                               (push (list
-                                     (fixmee-measure-urgency raw-match)
+                                     (funcall fixmee-measure-urgency-function raw-match)
                                      (current-buffer)
                                      (match-beginning 1)
                                      (match-end 1))
